@@ -1,0 +1,3328 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Quiz System v5.4 - Complete</title>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', 'Nirmala UI', sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ===== STICKY HEADER ===== */
+        #quizStickyHeader {
+            display: none;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #1e293b;
+            padding: 12px 20px;
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        #quizStickyHeader .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        #quizStickyHeader .header-left .quiz-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #fff;
+        }
+        #quizStickyHeader .timer-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-left: auto;
+        }
+        #quizStickyHeader .timer-box {
+            background: #0f172a;
+            padding: 4px 14px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 70px;
+        }
+        #quizStickyHeader .timer-box .label {
+            font-size: 0.55rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        #quizStickyHeader .timer-box .time {
+            font-size: 1.1rem;
+            font-weight: bold;
+            font-family: monospace;
+        }
+        .timer-total .time {
+            color: #3b82f6;
+        }
+        .timer-question .time {
+            color: #10b981;
+        }
+        .timer-warning .time {
+            color: #ef4444;
+            animation: blink 0.5s infinite;
+        }
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+        #quizStickyHeader .progress-small {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            min-width: 60px;
+            text-align: center;
+        }
+        #quizStickyHeader .btn-exit {
+            padding: 6px 16px;
+            background: #ef4444;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        #quizStickyHeader .btn-exit:hover {
+            background: #dc2626;
+        }
+
+        /* ===== STUDY MODE HEADER ===== */
+        #studyHeader {
+            display: none;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #1e293b;
+            padding: 12px 20px;
+            border-radius: 0 0 16px 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        #studyHeader .study-progress {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+        #studyHeader .study-progress strong {
+            color: #fff;
+        }
+        #studyHeader .btn-exit-study {
+            padding: 6px 16px;
+            background: #ef4444;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin-left: auto;
+        }
+        #studyHeader .btn-exit-study:hover {
+            background: #dc2626;
+        }
+
+        /* ===== LOGIN ===== */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a, #1e1b4b);
+        }
+        .login-box {
+            background: #1e293b;
+            padding: 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+        }
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+        .login-box .subtitle {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+        .login-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .login-tab {
+            flex: 1;
+            padding: 10px;
+            background: #334155;
+            border: none;
+            border-radius: 12px;
+            color: #94a3b8;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .login-tab.active {
+            background: #3b82f6;
+            color: white;
+        }
+        .login-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            background: #0f172a;
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+        .login-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+        .login-error {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        /* ===== MAIN APP ===== */
+        .app-container {
+            display: none;
+        }
+
+        /* ===== NAV ===== */
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: #1e293b;
+            padding: 12px 15px;
+            border-radius: 16px;
+            position: relative;
+        }
+        .nav-tab {
+            padding: 10px 18px;
+            background: #334155;
+            border: none;
+            border-radius: 10px;
+            color: #94a3b8;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+        .nav-tab:hover {
+            background: #475569;
+            color: white;
+        }
+        .nav-tab.active {
+            background: #3b82f6;
+            color: white;
+        }
+        .nav-tab.study-tab {
+            background: #8b5cf6;
+            color: white;
+        }
+        .nav-tab.study-tab:hover {
+            background: #7c3aed;
+        }
+        .nav-tab.study-tab.active {
+            background: #7c3aed;
+        }
+
+        .header-logout {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-left: auto;
+        }
+        .header-logout .user-name {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        .header-logout .btn-logout {
+            padding: 6px 16px;
+            background: #ef4444;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        .header-logout .btn-logout:hover {
+            background: #dc2626;
+        }
+
+        /* ===== PANELS ===== */
+        .panel-content {
+            display: none;
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .panel-content.active {
+            display: block;
+        }
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 12px;
+        }
+
+        /* ===== CARDS ===== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid #334155;
+            transition: all 0.3s;
+        }
+        .card:hover {
+            border-color: #3b82f6;
+        }
+        .card-title {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+        .card-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            margin-top: 5px;
+        }
+
+        /* ===== FORMS ===== */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-label {
+            display: block;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            background: #0f172a;
+            color: white;
+            font-size: 0.95rem;
+        }
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        .form-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 12px 14px;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            background: #0f172a;
+            color: white;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            resize: vertical;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #d97706;
+        }
+        .btn-purple {
+            background: #8b5cf6;
+            color: white;
+        }
+        .btn-purple:hover {
+            background: #7c3aed;
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.8rem;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ===== STUDY MODE SPECIFIC ===== */
+        .study-question-card {
+            background: #0f172a;
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid #334155;
+            margin-bottom: 16px;
+        }
+        .study-question-card .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .study-question-card .q-num {
+            background: #8b5cf6;
+            color: white;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        .study-question-card .q-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            line-height: 1.6;
+            color: #fff;
+        }
+        .study-question-card .q-hindi {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 3px solid #334155;
+        }
+        .study-question-card .q-source {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px dashed #334155;
+        }
+        .study-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            margin: 6px 0;
+            background: #1e293b;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .study-option:hover {
+            background: #2d3a52;
+            border-color: #475569;
+        }
+        .study-option .opt-text {
+            flex: 1;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+        }
+        .study-option.correct {
+            border-color: #10b981;
+            background: #10b98122;
+        }
+        .study-option.correct .opt-text {
+            color: #10b981;
+        }
+        .study-option.wrong {
+            border-color: #ef4444;
+            background: #ef444422;
+        }
+        .study-option.wrong .opt-text {
+            color: #ef4444;
+        }
+        .study-option.show-correct {
+            border-color: #10b981;
+            background: #10b98122;
+        }
+        .study-option.show-correct .opt-text {
+            color: #10b981;
+        }
+        .study-option.disabled {
+            cursor: default;
+        }
+        .study-option.disabled:hover {
+            border-color: transparent;
+            background: #1e293b;
+        }
+
+        .study-nav {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .study-nav .btn {
+            padding: 12px 30px;
+            font-size: 1rem;
+        }
+        .study-explain {
+            background: #0f172a;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-top: 15px;
+            border-left: 4px solid #8b5cf6;
+            display: none;
+        }
+        .study-explain .exp-title {
+            color: #8b5cf6;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .study-explain .exp-text {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        .study-progress-bar {
+            background: #1e293b;
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+        .study-progress-bar .bar-track {
+            background: #334155;
+            border-radius: 30px;
+            height: 8px;
+            overflow: hidden;
+        }
+        .study-progress-bar .bar-fill {
+            background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+            height: 100%;
+            border-radius: 30px;
+            transition: width 0.3s;
+        }
+        .study-progress-bar .bar-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .study-circle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #8b5cf622;
+            border: 2px solid #8b5cf6;
+            color: #8b5cf6;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .custom-time-group {
+            display: none;
+        }
+        .custom-time-group.show {
+            display: block;
+        }
+
+        .start-from-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .start-from-group label {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+        .start-from-group input {
+            width: 70px;
+            padding: 6px 10px;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            background: #0f172a;
+            color: white;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .start-from-group input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+        }
+        .start-from-group .btn {
+            padding: 6px 16px;
+            font-size: 0.8rem;
+        }
+
+        /* ===== QUESTION CARDS ===== */
+        .question-card {
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid #334155;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+        }
+        .question-card:hover {
+            border-color: #3b82f6;
+        }
+        .question-card .q-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .question-card .q-num {
+            background: #3b82f6;
+            color: white;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+        .question-card .q-timer {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #10b981;
+        }
+        .question-card .q-timer.warning {
+            color: #ef4444;
+            animation: blink 0.5s infinite;
+        }
+        .question-card .q-text {
+            font-weight: 600;
+            margin-bottom: 8px;
+            line-height: 1.5;
+            color: #fff;
+        }
+        .question-card .q-hindi {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            padding-left: 8px;
+            border-left: 3px solid #334155;
+        }
+        .question-card .option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            margin: 4px 0;
+            background: #1e293b;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .question-card .option:hover {
+            background: #2d3a52;
+        }
+        .question-card .option input {
+            width: 18px;
+            height: 18px;
+            accent-color: #3b82f6;
+            cursor: pointer;
+        }
+        .question-card .option label {
+            cursor: pointer;
+            flex: 1;
+            color: #e2e8f0;
+        }
+        .question-card .q-source {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px dashed #334155;
+        }
+
+        /* ===== RESULTS ===== */
+        .result-item {
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 12px;
+            background: #0f172a;
+            border-left: 4px solid #94a3b8;
+        }
+        .result-item.correct {
+            border-left-color: #10b981;
+            background: #10b98122;
+        }
+        .result-item.wrong {
+            border-left-color: #ef4444;
+            background: #ef444422;
+        }
+        .result-item.unattempted {
+            border-left-color: #f59e0b;
+            background: #f59e0b22;
+        }
+
+        /* ===== STATUS ===== */
+        .status-success {
+            padding: 12px;
+            border-radius: 10px;
+            background: #0f172a;
+            border-left: 4px solid #10b981;
+            color: #10b981;
+        }
+        .status-error {
+            padding: 12px;
+            border-radius: 10px;
+            background: #0f172a;
+            border-left: 4px solid #ef4444;
+            color: #ef4444;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-box {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 95%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-box h3 {
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        /* ===== QUIZ CONTAINER ===== */
+        #practiceQuizContainer,
+        #mockQuizContainer,
+        #questionsContainer {
+            display: block;
+            min-height: 200px;
+            margin-top: 20px;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 10px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            #quizStickyHeader {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            #quizStickyHeader .timer-group {
+                margin-left: 0;
+                justify-content: center;
+            }
+            #studyHeader {
+                flex-direction: column;
+                text-align: center;
+            }
+            #studyHeader .btn-exit-study {
+                margin-left: 0;
+            }
+            .nav-tabs {
+                flex-direction: column;
+            }
+            .header-logout {
+                margin-left: 0;
+                justify-content: center;
+                padding-top: 10px;
+                border-top: 1px solid #334155;
+            }
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            .login-box {
+                margin: 20px;
+                padding: 30px 20px;
+            }
+            #quizStickyHeader .header-left {
+                justify-content: center;
+            }
+        }
+
+        .flex {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .mt-10 {
+            margin-top: 10px;
+        }
+        .mt-15 {
+            margin-top: 15px;
+        }
+        .mb-10 {
+            margin-bottom: 10px;
+        }
+        .mb-15 {
+            margin-bottom: 15px;
+        }
+        .w-full {
+            width: 100%;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .table-wrap {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th,
+        td {
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid #334155;
+        }
+        th {
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+        td {
+            color: #e2e8f0;
+        }
+
+        .mock-settings {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 10px;
+        }
+        .mock-settings .setting-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+        .mock-settings .setting-row .form-group {
+            margin-bottom: 8px;
+        }
+        .mock-settings .setting-row .form-group label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== LOGIN ==================== -->
+    <div id="loginContainer" class="login-container">
+        <div class="login-box">
+            <h2>📚 Smart Quiz System</h2>
+            <p class="subtitle">Admin / Student Login</p>
+            <div class="login-tabs">
+                <button class="login-tab active" data-role="admin">👨‍💼 Admin</button>
+                <button class="login-tab" data-role="student">👨‍🎓 Student</button>
+            </div>
+            <input type="text" id="loginUsername" class="login-input" placeholder="Username / Mobile">
+            <input type="password" id="loginPassword" class="login-input" placeholder="Password">
+            <button class="login-btn" id="loginBtn">🔐 Login</button>
+            <div id="loginError" class="login-error">❌ Invalid credentials!</div>
+        </div>
+    </div>
+
+    <!-- ==================== MAIN APP ==================== -->
+    <div id="appContainer" class="app-container">
+        <div class="container">
+
+            <!-- ===== STICKY HEADER (Quiz Mode) ===== -->
+            <div id="quizStickyHeader">
+                <div class="header-left">
+                    <span class="quiz-title" id="quizHeaderTitle">📝 Quiz</span>
+                    <span class="progress-small" id="quizProgressDisplay">0/0 (0%)</span>
+                </div>
+                <div class="timer-group">
+                    <div class="timer-box timer-total">
+                        <div class="label">⏱ Total Time</div>
+                        <div class="time" id="totalTimerDisplay">00:00</div>
+                    </div>
+                    <div class="timer-box timer-question" id="questionTimerBox">
+                        <div class="label">📌 This Question</div>
+                        <div class="time" id="questionTimerDisplay">--</div>
+                    </div>
+                    <button class="btn-exit" onclick="exitQuiz()">✖ Exit</button>
+                </div>
+            </div>
+
+            <!-- ===== STICKY HEADER (Study Mode) ===== -->
+            <div id="studyHeader">
+                <div style="display:flex;align-items:center;gap:15px;flex-wrap:wrap;">
+                    <span style="font-weight:600;color:#8b5cf6;">📖 Study Mode</span>
+                    <span class="study-progress" id="studyProgressText">Question <strong id="studyCurrentNum">1</strong> of <strong id="studyTotalNum">0</strong></span>
+                    <span class="study-circle" id="studyProgressCircle">0%</span>
+                </div>
+                <button class="btn-exit-study" onclick="exitStudyMode()">✖ Exit Study</button>
+            </div>
+
+            <!-- ===== NAVIGATION ===== -->
+            <div class="nav-tabs" id="navTabs">
+                <!-- Admin -->
+                <button class="nav-tab admin-only" data-panel="admin-dashboard">📊 Dashboard</button>
+                <button class="nav-tab admin-only" data-panel="admin-upload">📤 Upload HTML</button>
+                <button class="nav-tab admin-only" data-panel="admin-questions">📚 Questions</button>
+                <button class="nav-tab admin-only" data-panel="admin-exams">📝 Exams</button>
+                <button class="nav-tab admin-only" data-panel="admin-students">👥 Students</button>
+                <button class="nav-tab admin-only" data-panel="admin-backup">💾 Backup</button>
+                <!-- Student -->
+                <button class="nav-tab student-only" data-panel="student-dashboard">📊 Dashboard</button>
+                <button class="nav-tab student-only study-tab" data-panel="student-study">📖 Study</button>
+                <button class="nav-tab student-only" data-panel="student-practice">📝 Practice</button>
+                <button class="nav-tab student-only" data-panel="student-exams">📋 Exams</button>
+                <button class="nav-tab student-only" data-panel="student-mock">🔥 Mock Tests</button>
+                <button class="nav-tab student-only" data-panel="student-progress">📈 Progress</button>
+                <button class="nav-tab student-only" data-panel="student-wrong">❌ Wrong</button>
+                <button class="nav-tab student-only" data-panel="student-leaderboard">🏆 Leaderboard</button>
+            </div>
+
+            <!-- ========================================= -->
+            <!-- ADMIN PANELS -->
+            <!-- ========================================= -->
+
+            <div id="panel-admin-dashboard" class="panel-content">
+                <div class="panel-title">📊 Admin Dashboard</div>
+                <div class="card-grid" id="adminStats">
+                    <div class="card"><div class="card-title">Total Questions</div><div class="card-value" id="statQuestions">0</div></div>
+                    <div class="card"><div class="card-title">Total Subjects</div><div class="card-value" id="statSubjects">0</div></div>
+                    <div class="card"><div class="card-title">Total Chapters</div><div class="card-value" id="statChapters">0</div></div>
+                    <div class="card"><div class="card-title">Total Topics</div><div class="card-value" id="statTopics">0</div></div>
+                    <div class="card"><div class="card-title">Total Students</div><div class="card-value" id="statStudents">0</div></div>
+                    <div class="card"><div class="card-title">Total Exams</div><div class="card-value" id="statExams">0</div></div>
+                </div>
+            </div>
+
+            <div id="panel-admin-upload" class="panel-content">
+                <div class="panel-title">📤 Upload HTML Code</div>
+                <div class="form-group">
+                    <label class="form-label">📚 Subject</label>
+                    <select id="uploadSubject" class="form-select"><option value="">-- Select --</option></select>
+                    <div class="flex mt-10">
+                        <input type="text" id="newSubjectInput" class="form-input" placeholder="New Subject" style="flex:1;">
+                        <button class="btn btn-success btn-sm" onclick="addNewSubject()">➕ Add</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">📖 Chapter</label>
+                    <select id="uploadChapter" class="form-select"><option value="">-- Select --</option></select>
+                    <div class="flex mt-10">
+                        <input type="text" id="newChapterInput" class="form-input" placeholder="New Chapter" style="flex:1;">
+                        <button class="btn btn-success btn-sm" onclick="addNewChapter()">➕ Add</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">📑 Topic</label>
+                    <select id="uploadTopic" class="form-select"><option value="">-- Select --</option></select>
+                    <div class="flex mt-10">
+                        <input type="text" id="newTopicInput" class="form-input" placeholder="New Topic" style="flex:1;">
+                        <button class="btn btn-success btn-sm" onclick="addNewTopic()">➕ Add</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">📄 Paste HTML Code</label>
+                    <textarea id="htmlCodeInput" class="form-textarea" placeholder="Paste HTML code with questions..."></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="parseHTMLAndUpload()">🔍 Parse & Upload</button>
+                <div id="uploadStatus" class="mt-15"></div>
+            </div>
+
+            <div id="panel-admin-questions" class="panel-content">
+                <div class="panel-title">📚 Question Management <span style="font-size:0.8rem;color:#94a3b8;">(Click question to edit)</span></div>
+                <div class="flex mb-15">
+                    <button class="btn btn-primary" onclick="viewAllQuestions()">📋 View All</button>
+                    <button class="btn btn-danger" onclick="deleteAllQuestions()">🗑️ Delete All</button>
+                    <button class="btn btn-success" onclick="exportQuestions()">📤 Export</button>
+                </div>
+                <div id="questionListContainer"><p style="color:#94a3b8;">Click "View All" to see questions.</p></div>
+            </div>
+
+            <div id="panel-admin-exams" class="panel-content">
+                <div class="panel-title">📝 Exam Management</div>
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-title">Create Exam</div>
+                        <input type="text" id="examName" class="form-input" placeholder="Exam Name" class="mb-10">
+                        <input type="number" id="examQuestions" class="form-input" placeholder="Questions" class="mb-10">
+                        <input type="number" id="examTime" class="form-input" placeholder="Time (minutes)" class="mb-10">
+                        <input type="number" id="examNegative" class="form-input" placeholder="Negative (-0.25)" value="0" class="mb-10">
+                        <select id="examSubject" class="form-select" class="mb-10"><option value="">Subject</option></select>
+                        <select id="examChapter" class="form-select" class="mb-10"><option value="">Chapter</option></select>
+                        <select id="examTopic" class="form-select" class="mb-10"><option value="">Topic</option></select>
+                        <label class="flex" style="color:#94a3b8;align-items:center;gap:8px;margin-top:8px;"><input type="checkbox" id="examShuffle" checked> Shuffle Questions</label>
+                        <button class="btn btn-success mt-15 w-full" onclick="createExam()">✅ Create Exam</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Existing Exams</div>
+                        <div id="examList" style="max-height:350px;overflow-y:auto;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="panel-admin-students" class="panel-content">
+                <div class="panel-title">👥 Student Management <span style="font-size:0.8rem;color:#94a3b8;">(Click student to edit)</span></div>
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-title">Add Student</div>
+                        <input type="text" id="studentName" class="form-input" placeholder="Name" class="mb-10">
+                        <input type="text" id="studentMobile" class="form-input" placeholder="Mobile" class="mb-10">
+                        <input type="text" id="studentFather" class="form-input" placeholder="Father's Name" class="mb-10">
+                        <input type="text" id="studentVillage" class="form-input" placeholder="Village" class="mb-10">
+                        <input type="text" id="studentPassword" class="form-input" placeholder="Password" class="mb-10">
+                        <button class="btn btn-success w-full mt-10" onclick="addStudent()">➕ Add Student</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">All Students</div>
+                        <div id="studentListContainer" style="max-height:350px;overflow-y:auto;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="panel-admin-backup" class="panel-content">
+                <div class="panel-title">💾 Backup & Restore</div>
+                <div class="flex">
+                    <button class="btn btn-primary" onclick="downloadBackup()">📥 Download Backup</button>
+                    <button class="btn btn-warning" onclick="document.getElementById('restoreFileInput').click()">📤 Restore</button>
+                    <input type="file" id="restoreFileInput" accept=".json" style="display:none;" onchange="restoreBackup(event)">
+                </div>
+                <div id="backupStatus" class="mt-15"></div>
+            </div>
+
+            <!-- ========================================= -->
+            <!-- STUDENT PANELS -->
+            <!-- ========================================= -->
+
+            <div id="panel-student-dashboard" class="panel-content">
+                <div class="panel-title">📊 Student Dashboard</div>
+                <div class="card-grid" id="studentDashboardStats">
+                    <div class="card"><div class="card-title">Total Attempted</div><div class="card-value" id="sTotalAttempted">0</div></div>
+                    <div class="card"><div class="card-title">Correct</div><div class="card-value" id="sCorrect">0</div></div>
+                    <div class="card"><div class="card-title">Wrong</div><div class="card-value" id="sWrong">0</div></div>
+                    <div class="card"><div class="card-title">Accuracy</div><div class="card-value" id="sAccuracy">0%</div></div>
+                </div>
+            </div>
+
+            <!-- ===== STUDY MODE PANEL - UPDATED (Grid Removed) ===== -->
+            <div id="panel-student-study" class="panel-content">
+                <div class="panel-title">📖 Study Mode <span style="font-size:0.8rem;color:#94a3b8;">(Learn at your own pace)</span></div>
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-title">Subject</div>
+                        <select id="studySubject" class="form-select" onchange="updateStudyChapters()"><option value="">-- Select --</option></select>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Chapter</div>
+                        <select id="studyChapter" class="form-select" onchange="updateStudyTopics()"><option value="">-- Select --</option></select>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Topic</div>
+                        <select id="studyTopic" class="form-select" onchange="updateStudyQuestions()"><option value="">-- Select --</option></select>
+                    </div>
+                </div>
+
+                <div id="studyQuestionsList" style="margin-top:15px;display:none;">
+                    <div style="background:#0f172a;padding:15px 20px;border-radius:12px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                            <span style="color:#94a3b8;">
+                                📋 Available Questions: <strong id="studyTotalQCount" style="color:#fff;">0</strong>
+                            </span>
+                            <div class="start-from-group">
+                                <label style="color:#94a3b8;font-size:0.85rem;">Start from:</label>
+                                <input type="number" id="studyStartFrom" min="1" max="25" value="1" 
+                                       style="width:70px;padding:6px 10px;border:1px solid #334155;border-radius:8px;background:#0f172a;color:white;text-align:center;font-size:0.9rem;">
+                                <button class="btn btn-purple btn-sm" onclick="startFromQuestionNumber()">Go</button>
+                            </div>
+                        </div>
+                        <!-- ✅ Grid Hata Diya Gaya -->
+                    </div>
+                </div>
+
+                <!-- Study Quiz Container -->
+                <div id="studyQuizContainer" class="mt-15"></div>
+            </div>
+
+            <!-- ===== PRACTICE MODE ===== -->
+            <div id="panel-student-practice" class="panel-content">
+                <div class="panel-title">📝 Practice Mode</div>
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-title">Subject</div>
+                        <select id="practiceSubject" class="form-select" onchange="updatePracticeChapters()"><option value="">-- Select --</option></select>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Chapter</div>
+                        <select id="practiceChapter" class="form-select" onchange="updatePracticeTopics()"><option value="">-- Select --</option></select>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Topic</div>
+                        <select id="practiceTopic" class="form-select"><option value="">-- Select --</option></select>
+                    </div>
+                </div>
+                <div class="card mt-15">
+                    <div class="card-title">⚙️ Settings</div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:10px;">
+                        <div><label style="color:#94a3b8;font-size:0.8rem;">Questions</label><select id="practiceQCount" class="form-select"><option value="5">5</option><option value="10" selected>10</option><option value="20">20</option><option value="0">All</option></select></div>
+                        <div>
+                            <label style="color:#94a3b8;font-size:0.8rem;">Per Q Timer</label>
+                            <select id="practicePerQTimer" class="form-select" onchange="togglePracticeCustomTime()">
+                                <option value="0">No Timer</option>
+                                <option value="30">30 seconds</option>
+                                <option value="45">45 seconds</option>
+                                <option value="60" selected>60 seconds</option>
+                                <option value="90">90 seconds</option>
+                                <option value="120">120 seconds</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                        <div class="custom-time-group" id="practiceCustomTimeGroup">
+                            <label style="color:#94a3b8;font-size:0.8rem;">Custom Time (seconds)</label>
+                            <input type="number" id="practiceCustomTime" class="form-input" value="30" min="1">
+                        </div>
+                        <div><label style="color:#94a3b8;font-size:0.8rem;">Negative</label><select id="practiceNegative" class="form-select"><option value="0">Off</option><option value="0.25">-0.25</option><option value="0.50">-0.50</option><option value="1">-1.00</option></select></div>
+                    </div>
+                    <button class="btn btn-success mt-15 w-full" onclick="startPracticeQuiz()">▶ Start Quiz</button>
+                </div>
+                <div id="practiceQuizContainer" class="mt-15"></div>
+            </div>
+
+            <!-- ===== EXAMS ===== -->
+            <div id="panel-student-exams" class="panel-content">
+                <div class="panel-title">📋 Available Exams</div>
+                <div id="availableExams"></div>
+            </div>
+
+            <!-- ===== MOCK TESTS ===== -->
+            <div id="panel-student-mock" class="panel-content">
+                <div class="panel-title">🔥 Mock Test Mode</div>
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-title">📚 Subject Mock Test</div>
+                        <select id="mockSubject" class="form-select mt-10"><option value="">Select Subject</option></select>
+                        <div class="mock-settings">
+                            <div class="setting-row">
+                                <div class="form-group">
+                                    <label>📊 Questions</label>
+                                    <select id="mockQCount" class="form-select">
+                                        <option value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="15">15</option>
+                                        <option value="20" selected>20</option>
+                                        <option value="25">25</option>
+                                        <option value="30">30</option>
+                                        <option value="0">All</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>⏱ Per Question Time</label>
+                                    <select id="mockPerQTimer" class="form-select" onchange="updateMockTotalTime()">
+                                        <option value="0">No Timer</option>
+                                        <option value="30">30 seconds</option>
+                                        <option value="45">45 seconds</option>
+                                        <option value="60" selected>60 seconds</option>
+                                        <option value="90">90 seconds</option>
+                                        <option value="120">120 seconds</option>
+                                        <option value="custom">Custom</option>
+                                        <option value="total">Total Time</option>
+                                    </select>
+                                </div>
+                                <div class="form-group custom-time-group" id="mockCustomTimeGroup">
+                                    <label>Custom Time (seconds)</label>
+                                    <input type="number" id="mockCustomTime" class="form-input" value="30" min="1" onchange="updateMockTotalTime()">
+                                </div>
+                                <div class="form-group" id="mockTotalTimeGroup" style="display:none;">
+                                    <label>Total Time (minutes)</label>
+                                    <input type="number" id="mockTotalTimeInput" class="form-input" value="30" min="1" onchange="updateMockTotalTime()">
+                                </div>
+                                <div class="form-group">
+                                    <label>📉 Negative Marking</label>
+                                    <select id="mockNegative" class="form-select">
+                                        <option value="0">Off</option>
+                                        <option value="0.25">-0.25</option>
+                                        <option value="0.50">-0.50</option>
+                                        <option value="1.00">-1.00</option>
+                                        <option value="custom">Custom</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="mockCustomNegGroup" style="display:none;">
+                                    <label>Custom Negative</label>
+                                    <input type="number" id="mockCustomNeg" class="form-input" value="0.25" step="0.05" min="0">
+                                </div>
+                            </div>
+                            <div style="margin-top:10px;color:#94a3b8;font-size:0.9rem;">
+                                ⏱ Per Question Time: <span id="mockPerQTimeDisplay">60 seconds</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary mt-10 w-full" onclick="startMockTest('subject')">▶ Start Mock Test</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">📖 Chapter Mock Test</div>
+                        <select id="mockChapterSubject" class="form-select" onchange="updateMockChapters()"><option value="">Select Subject</option></select>
+                        <select id="mockChapter" class="form-select mt-10"><option value="">Select Chapter</option></select>
+                        <div class="mock-settings">
+                            <div class="setting-row">
+                                <div class="form-group">
+                                    <label>📊 Questions</label>
+                                    <select id="mockChapterQCount" class="form-select">
+                                        <option value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="15">15</option>
+                                        <option value="20" selected>20</option>
+                                        <option value="25">25</option>
+                                        <option value="30">30</option>
+                                        <option value="0">All</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>⏱ Per Question Time</label>
+                                    <select id="mockChapterPerQTimer" class="form-select" onchange="updateMockChapterTotalTime()">
+                                        <option value="0">No Timer</option>
+                                        <option value="30">30 seconds</option>
+                                        <option value="45">45 seconds</option>
+                                        <option value="60" selected>60 seconds</option>
+                                        <option value="90">90 seconds</option>
+                                        <option value="120">120 seconds</option>
+                                        <option value="custom">Custom</option>
+                                        <option value="total">Total Time</option>
+                                    </select>
+                                </div>
+                                <div class="form-group custom-time-group" id="mockChapterCustomTimeGroup">
+                                    <label>Custom Time (seconds)</label>
+                                    <input type="number" id="mockChapterCustomTime" class="form-input" value="30" min="1" onchange="updateMockChapterTotalTime()">
+                                </div>
+                                <div class="form-group" id="mockChapterTotalTimeGroup" style="display:none;">
+                                    <label>Total Time (minutes)</label>
+                                    <input type="number" id="mockChapterTotalTimeInput" class="form-input" value="30" min="1" onchange="updateMockChapterTotalTime()">
+                                </div>
+                                <div class="form-group">
+                                    <label>📉 Negative Marking</label>
+                                    <select id="mockChapterNegative" class="form-select">
+                                        <option value="0">Off</option>
+                                        <option value="0.25">-0.25</option>
+                                        <option value="0.50">-0.50</option>
+                                        <option value="1.00">-1.00</option>
+                                        <option value="custom">Custom</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="mockChapterCustomNegGroup" style="display:none;">
+                                    <label>Custom Negative</label>
+                                    <input type="number" id="mockChapterCustomNeg" class="form-input" value="0.25" step="0.05" min="0">
+                                </div>
+                            </div>
+                            <div style="margin-top:10px;color:#94a3b8;font-size:0.9rem;">
+                                ⏱ Per Question Time: <span id="mockChapterPerQTimeDisplay">60 seconds</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary mt-10 w-full" onclick="startMockTest('chapter')">▶ Start Mock Test</button>
+                    </div>
+                </div>
+                <div id="mockQuizContainer" class="mt-15"></div>
+            </div>
+
+            <!-- ===== PROGRESS ===== -->
+            <div id="panel-student-progress" class="panel-content">
+                <div class="panel-title">📈 Progress Report</div>
+                <div id="progressReport"></div>
+            </div>
+
+            <!-- ===== WRONG QUESTIONS ===== -->
+            <div id="panel-student-wrong" class="panel-content">
+                <div class="panel-title">❌ Wrong Questions</div>
+                <div class="flex mb-15">
+                    <button class="btn btn-primary btn-sm" onclick="showWrongQuestions('last')">Last Quiz</button>
+                    <button class="btn btn-primary btn-sm" onclick="showWrongQuestions('all')">All Wrong</button>
+                </div>
+                <div id="wrongQuestionsContainer"></div>
+            </div>
+
+            <!-- ===== LEADERBOARD ===== -->
+            <div id="panel-student-leaderboard" class="panel-content">
+                <div class="panel-title">🏆 Leaderboard</div>
+                <div class="flex mb-15">
+                    <select id="leaderboardFilter" class="form-select" style="width:200px;">
+                        <option value="alltime">All Time</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="showLeaderboard()">View</button>
+                </div>
+                <div id="leaderboardContainer"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ==================== MODAL ==================== -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal-box">
+            <h3 id="modalTitle">Modal</h3>
+            <div id="modalBody"></div>
+            <button class="btn btn-danger mt-15" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // ============================================================
+        // DATABASE
+        // ============================================================
+        const DB = {
+            get: (key, def) => { try { const d = localStorage.getItem('quiz_' + key); return d ? JSON.parse(d) :
+                    def; } catch { return def; } },
+            set: (key, val) => { localStorage.setItem('quiz_' + key, JSON.stringify(val)); }
+        };
+
+        const ADMIN_PASSWORD = 'admin123';
+        let currentUser = null;
+        let loginRole = 'admin';
+
+        // ============================================================
+        // STUDY MODE VARIABLES
+        // ============================================================
+        let studyQuestions = [];
+        let studyCurrentIndex = 0;
+        let studyAnswered = false;
+
+        // ============================================================
+        // FIXED: Math Format Function
+        // ============================================================
+        function fixMath(text) {
+            if (!text) return text;
+            let fixed = text;
+            fixed = fixed.replace(/\^\{(\d+)\}/g, '^{$1}');
+            fixed = fixed.replace(/\^\{(\d+)\}/g, '^{$1}');
+            fixed = fixed.replace(/(\d+)\^(\d+)\{(\d+)\}/g, '$1^{$3}');
+            fixed = fixed.replace(/\^(\d+)\{(\d+)\}/g, '^{$2}');
+            fixed = fixed.replace(/\^(\d+)\s*\{(\d+)\}/g, '^{$2}');
+            return fixed;
+        }
+
+        // ============================================================
+        // LOGIN
+        // ============================================================
+        document.querySelectorAll('.login-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                loginRole = this.dataset.role;
+                document.getElementById('loginUsername').placeholder = loginRole === 'admin' ? 'Username' :
+                    'Mobile Number';
+            });
+        });
+
+        document.getElementById('loginBtn').addEventListener('click', doLogin);
+        document.getElementById('loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+        function doLogin() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const errorEl = document.getElementById('loginError');
+            errorEl.style.display = 'none';
+
+            if (loginRole === 'admin') {
+                if (password === ADMIN_PASSWORD) {
+                    currentUser = { role: 'admin' };
+                    showApp();
+                } else {
+                    errorEl.style.display = 'block';
+                }
+            } else {
+                const students = DB.get('students', []);
+                const student = students.find(s => s.mobile === username && s.password === password);
+                if (student && !student.banned) {
+                    currentUser = { role: 'student', data: student };
+                    showApp();
+                } else {
+                    errorEl.style.display = 'block';
+                }
+            }
+        }
+
+        function showApp() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.style.display = (currentUser.role === 'admin') ?
+                    (tab.classList.contains('admin-only') ? 'inline-block' : 'none') :
+                    (tab.classList.contains('student-only') ? 'inline-block' : 'none');
+            });
+            loadAllData();
+            const firstTab = document.querySelector('.nav-tab:not([style*="display: none"])');
+            if (firstTab) firstTab.click();
+            addLogoutButton();
+        }
+
+        function addLogoutButton() {
+            if (document.querySelector('.header-logout')) return;
+            const nav = document.querySelector('.nav-tabs');
+            if (nav) {
+                const div = document.createElement('div');
+                div.className = 'header-logout';
+                const name = currentUser?.role === 'admin' ? 'Admin' : currentUser?.data?.name || 'Student';
+                div.innerHTML =
+                    `<span class="user-name">👤 ${name}</span><button class="btn-logout" onclick="logoutUser()">🚪 Logout</button>`;
+                nav.appendChild(div);
+            }
+        }
+
+        function logoutUser() {
+            if (quizTimerInterval) clearInterval(quizTimerInterval);
+            if (questionTimerInterval) clearInterval(questionTimerInterval);
+            currentUser = null;
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('appContainer').style.display = 'none';
+            document.getElementById('quizStickyHeader').style.display = 'none';
+            document.getElementById('studyHeader').style.display = 'none';
+            const logoutBtn = document.querySelector('.header-logout');
+            if (logoutBtn) logoutBtn.remove();
+            ['practiceQuizContainer', 'mockQuizContainer', 'questionsContainer', 'studyQuizContainer'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = '';
+            });
+        }
+
+        // ============================================================
+        // NAVIGATION
+        // ============================================================
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                if (document.getElementById('studyHeader').style.display === 'flex') {
+                    if (!confirm('Study mode is active. Exit?')) return;
+                    exitStudyMode();
+                }
+                if (document.getElementById('quizStickyHeader').style.display === 'flex') {
+                    if (!confirm('Quiz in progress. Exit?')) return;
+                    exitQuiz();
+                }
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.panel-content').forEach(p => p.classList.remove('active'));
+                const p = document.getElementById('panel-' + this.dataset.panel);
+                if (p) p.classList.add('active');
+                loadAllData();
+                if (this.dataset.panel === 'student-study') {
+                    updateStudySelects();
+                }
+            });
+        });
+
+        // ============================================================
+        // DATA LOADING
+        // ============================================================
+        function loadAllData() {
+            if (currentUser?.role === 'admin') {
+                const q = DB.get('questions', []);
+                const s = DB.get('subjects', []);
+                const c = DB.get('chapters', []);
+                const t = DB.get('topics', []);
+                const st = DB.get('students', []);
+                const e = DB.get('exams', []);
+                document.getElementById('statQuestions').textContent = q.length;
+                document.getElementById('statSubjects').textContent = s.length;
+                document.getElementById('statChapters').textContent = c.length;
+                document.getElementById('statTopics').textContent = t.length;
+                document.getElementById('statStudents').textContent = st.length;
+                document.getElementById('statExams').textContent = e.length;
+                updateSubjectSelects();
+                updateExamLists();
+                updateStudentList();
+            }
+            if (currentUser?.role === 'student') {
+                updateStudentDashboard();
+                updatePracticeSelects();
+                updateExamListStudent();
+                updateMockSelects();
+                updateStudySelects();
+                showLeaderboard();
+                showProgressReport();
+                updateMockTotalTime();
+                updateMockChapterTotalTime();
+                togglePracticeCustomTime();
+            }
+        }
+
+        // ============================================================
+        // SUBJECT / CHAPTER / TOPIC HELPERS
+        // ============================================================
+        function getSubjects() { return DB.get('subjects', []); }
+
+        function getChapters(subject) {
+            const all = DB.get('chapters', []);
+            return subject ? all.filter(c => c.subject === subject) : all;
+        }
+
+        function getTopics(chapter) {
+            const all = DB.get('topics', []);
+            return chapter ? all.filter(t => t.chapter === chapter) : all;
+        }
+
+        function addSubject(name) {
+            if (!name.trim()) return false;
+            const s = DB.get('subjects', []);
+            if (s.includes(name.trim())) return false;
+            s.push(name.trim());
+            DB.set('subjects', s);
+            return true;
+        }
+
+        function addChapter(subject, name) {
+            if (!subject || !name.trim()) return false;
+            const c = DB.get('chapters', []);
+            if (c.some(x => x.subject === subject && x.chapter === name.trim())) return false;
+            c.push({ subject: subject.trim(), chapter: name.trim() });
+            DB.set('chapters', c);
+            return true;
+        }
+
+        function addTopic(chapter, name) {
+            if (!chapter || !name.trim()) return false;
+            const t = DB.get('topics', []);
+            if (t.some(x => x.chapter === chapter && x.topic === name.trim())) return false;
+            t.push({ chapter: chapter.trim(), topic: name.trim() });
+            DB.set('topics', t);
+            return true;
+        }
+
+        function updateSubjectSelects() {
+            const subjects = getSubjects();
+            ['uploadSubject', 'examSubject', 'practiceSubject', 'mockSubject', 'mockChapterSubject', 'studySubject']
+            .forEach(id => {
+                const sel = document.getElementById(id);
+                if (!sel) return;
+                const cur = sel.value;
+                sel.innerHTML = '<option value="">-- Select --</option>';
+                subjects.forEach(s => { sel.innerHTML += `<option value="${s}">${s}</option>`; });
+                if (subjects.includes(cur)) sel.value = cur;
+            });
+        }
+
+        function updateChapterSelects(subject) {
+            const chapters = getChapters(subject);
+            ['uploadChapter', 'examChapter', 'practiceChapter', 'studyChapter'].forEach(id => {
+                const sel = document.getElementById(id);
+                if (!sel) return;
+                const cur = sel.value;
+                sel.innerHTML = '<option value="">-- Select --</option>';
+                chapters.forEach(c => { sel.innerHTML += `<option value="${c.chapter}">${c.chapter}</option>`; });
+                if (chapters.some(c => c.chapter === cur)) sel.value = cur;
+            });
+        }
+
+        function updateTopicSelects(chapter) {
+            const topics = getTopics(chapter);
+            ['uploadTopic', 'examTopic', 'practiceTopic', 'studyTopic'].forEach(id => {
+                const sel = document.getElementById(id);
+                if (!sel) return;
+                const cur = sel.value;
+                sel.innerHTML = '<option value="">-- Select --</option>';
+                topics.forEach(t => { sel.innerHTML += `<option value="${t.topic}">${t.topic}</option>`; });
+                if (topics.some(t => t.topic === cur)) sel.value = cur;
+            });
+        }
+
+        document.getElementById('uploadSubject')?.addEventListener('change', function() { updateChapterSelects(this
+                .value); });
+        document.getElementById('uploadChapter')?.addEventListener('change', function() { updateTopicSelects(this.value); });
+        document.getElementById('examSubject')?.addEventListener('change', function() { updateChapterSelectsForExam(this
+                .value); });
+        document.getElementById('examChapter')?.addEventListener('change', function() { updateTopicSelectsForExam(this
+                .value); });
+        document.getElementById('studySubject')?.addEventListener('change', function() { updateStudyChapters(); });
+        document.getElementById('studyChapter')?.addEventListener('change', function() { updateStudyTopics(); });
+
+        function updateChapterSelectsForExam(subject) {
+            const chapters = getChapters(subject);
+            const sel = document.getElementById('examChapter');
+            const cur = sel.value;
+            sel.innerHTML = '<option value="">-- Select --</option>';
+            chapters.forEach(c => { sel.innerHTML += `<option value="${c.chapter}">${c.chapter}</option>`; });
+            if (chapters.some(c => c.chapter === cur)) sel.value = cur;
+        }
+
+        function updateTopicSelectsForExam(chapter) {
+            const topics = getTopics(chapter);
+            const sel = document.getElementById('examTopic');
+            const cur = sel.value;
+            sel.innerHTML = '<option value="">-- Select --</option>';
+            topics.forEach(t => { sel.innerHTML += `<option value="${t.topic}">${t.topic}</option>`; });
+            if (topics.some(t => t.topic === cur)) sel.value = cur;
+        }
+
+        function updatePracticeSelects() {
+            const subjects = getSubjects();
+            const sel = document.getElementById('practiceSubject');
+            sel.innerHTML = '<option value="">-- Select --</option>';
+            subjects.forEach(s => { sel.innerHTML += `<option value="${s}">${s}</option>`; });
+        }
+
+        function updatePracticeChapters() {
+            const subject = document.getElementById('practiceSubject').value;
+            const chapters = getChapters(subject);
+            const sel = document.getElementById('practiceChapter');
+            sel.innerHTML = '<option value="">-- Select --</option>';
+            chapters.forEach(c => { sel.innerHTML += `<option value="${c.chapter}">${c.chapter}</option>`; });
+        }
+
+        function updatePracticeTopics() {
+            const chapter = document.getElementById('practiceChapter').value;
+            const topics = getTopics(chapter);
+            const sel = document.getElementById('practiceTopic');
+            sel.innerHTML = '<option value="">-- Select --</option>';
+            topics.forEach(t => { sel.innerHTML += `<option value="${t.topic}">${t.topic}</option>`; });
+        }
+
+        function updateMockSelects() {
+            const subjects = getSubjects();
+            ['mockSubject', 'mockChapterSubject'].forEach(id => {
+                const sel = document.getElementById(id);
+                if (!sel) return;
+                const cur = sel.value;
+                sel.innerHTML = '<option value="">-- Select --</option>';
+                subjects.forEach(s => { sel.innerHTML += `<option value="${s}">${s}</option>`; });
+                if (subjects.includes(cur)) sel.value = cur;
+            });
+        }
+
+        function updateMockChapters() {
+            const subject = document.getElementById('mockChapterSubject').value;
+            const chapters = getChapters(subject);
+            const sel = document.getElementById('mockChapter');
+            sel.innerHTML = '<option value="">-- Select --</option>';
+            chapters.forEach(c => { sel.innerHTML += `<option value="${c.chapter}">${c.chapter}</option>`; });
+        }
+
+        // ============================================================
+        // STUDY MODE - UPDATED (No Grid)
+        // ============================================================
+        function updateStudySelects() {
+            const subjects = getSubjects();
+            const sel = document.getElementById('studySubject');
+            sel.innerHTML = '<option value="">-- Select --</option>';
+            subjects.forEach(s => { sel.innerHTML += `<option value="${s}">${s}</option>`; });
+            document.getElementById('studyChapter').innerHTML = '<option value="">-- Select --</option>';
+            document.getElementById('studyTopic').innerHTML = '<option value="">-- Select --</option>';
+            document.getElementById('studyQuestionsList').style.display = 'none';
+            document.getElementById('studyQuizContainer').innerHTML = '';
+        }
+
+        function updateStudyChapters() {
+            const subject = document.getElementById('studySubject').value;
+            const chapters = getChapters(subject);
+            const sel = document.getElementById('studyChapter');
+            sel.innerHTML = '<option value="">-- Select --</option>';
+            chapters.forEach(c => { sel.innerHTML += `<option value="${c.chapter}">${c.chapter}</option>`; });
+            document.getElementById('studyTopic').innerHTML = '<option value="">-- Select --</option>';
+            document.getElementById('studyQuestionsList').style.display = 'none';
+            document.getElementById('studyQuizContainer').innerHTML = '';
+        }
+
+        function updateStudyTopics() {
+            const chapter = document.getElementById('studyChapter').value;
+            const topics = getTopics(chapter);
+            const sel = document.getElementById('studyTopic');
+            sel.innerHTML = '<option value="">-- Select --</option>';
+            topics.forEach(t => { sel.innerHTML += `<option value="${t.topic}">${t.topic}</option>`; });
+            document.getElementById('studyQuestionsList').style.display = 'none';
+            document.getElementById('studyQuizContainer').innerHTML = '';
+        }
+
+        // ===== UPDATED: Study Questions - No Grid =====
+        function updateStudyQuestions() {
+            const subject = document.getElementById('studySubject').value;
+            const chapter = document.getElementById('studyChapter').value;
+            const topic = document.getElementById('studyTopic').value;
+
+            if (!subject || !chapter || !topic) {
+                document.getElementById('studyQuestionsList').style.display = 'none';
+                return;
+            }
+
+            let questions = DB.get('questions', []);
+            questions = questions.filter(q =>
+                q.subject === subject &&
+                q.chapter === chapter &&
+                q.topic === topic
+            );
+
+            // Sort by upload order
+            questions.sort((a, b) => {
+                const orderA = a.uploadOrder || a.id;
+                const orderB = b.uploadOrder || b.id;
+                return orderA - orderB;
+            });
+
+            if (questions.length === 0) {
+                document.getElementById('studyQuestionsList').style.display = 'block';
+                document.getElementById('studyTotalQCount').textContent = '0';
+                return;
+            }
+
+            studyQuestions = questions;
+
+            document.getElementById('studyQuestionsList').style.display = 'block';
+            document.getElementById('studyTotalQCount').textContent = questions.length;
+            document.getElementById('studyStartFrom').max = questions.length;
+            document.getElementById('studyStartFrom').value = 1;
+
+            // ✅ Grid removed - no HTML for grid
+
+            document.getElementById('studyQuizContainer').innerHTML = '';
+        }
+
+        // ===== Start From Question Number =====
+        function startFromQuestionNumber() {
+            const input = document.getElementById('studyStartFrom');
+            let num = parseInt(input.value) || 1;
+            const total = studyQuestions.length;
+
+            if (total === 0) {
+                alert('No questions available!');
+                return;
+            }
+
+            if (num < 1) num = 1;
+            if (num > total) num = total;
+
+            input.value = num;
+            const index = num - 1;
+
+            // Start from that question
+            startStudyFrom(index);
+        }
+
+        function startStudyFrom(index) {
+            if (studyQuestions.length === 0) {
+                alert('No questions to study!');
+                return;
+            }
+
+            studyCurrentIndex = index;
+            studyAnswered = false;
+
+            document.getElementById('studyHeader').style.display = 'flex';
+            document.getElementById('studyTotalNum').textContent = studyQuestions.length;
+
+            renderStudyQuestion();
+        }
+
+        // ===== Render Study Question - No Double Options =====
+        function renderStudyQuestion() {
+            const container = document.getElementById('studyQuizContainer');
+            const q = studyQuestions[studyCurrentIndex];
+            const total = studyQuestions.length;
+            const num = studyCurrentIndex + 1;
+
+            document.getElementById('studyCurrentNum').textContent = num;
+            const pct = Math.round((studyCurrentIndex / total) * 100);
+            document.getElementById('studyProgressCircle').textContent = pct + '%';
+
+            let html = `
+                <div class="study-progress-bar">
+                    <div class="bar-track">
+                        <div class="bar-fill" style="width:${(studyCurrentIndex/total)*100}%"></div>
+                    </div>
+                    <div class="bar-text">
+                        <span>Question ${num} of ${total}</span>
+                        <span>${studyCurrentIndex}/${total} completed</span>
+                    </div>
+                </div>
+                <div class="study-question-card">
+                    <div class="q-header">
+                        <span class="q-num">Q${num}</span>
+                        <span style="color:#94a3b8;font-size:0.8rem;">${q.subject} | ${q.chapter} | ${q.topic}</span>
+                    </div>
+                    <div class="q-text">${escapeHtml(q.question)}</div>
+                    ${q.hindi ? `<div class="q-hindi">${escapeHtml(q.hindi)}</div>` : ''}
+                    <div style="margin-top:15px;">
+                        ${['a','b','c','d'].map(letter => {
+                            const opt = q['option_'+letter] || '';
+                            return opt ? `
+                                <div class="study-option" id="studyOpt_${letter}" onclick="checkStudyAnswer('${letter}')" data-letter="${letter}">
+                                    <span class="opt-text">${escapeHtml(opt)}</span>
+                                </div>
+                            ` : '';
+                        }).join('')}
+                    </div>
+                    ${q.source ? `<div class="q-source">📚 ${escapeHtml(q.source)}</div>` : ''}
+                    <div class="study-explain" id="studyExplain">
+                        <div class="exp-title">💡 Explanation</div>
+                        <div class="exp-text" id="studyExplainText">${escapeHtml(q.explanation || 'No explanation available.')}</div>
+                    </div>
+                </div>
+                <div class="study-nav">
+                    <button class="btn btn-primary" onclick="studyPrev()" ${studyCurrentIndex === 0 ? 'disabled' : ''}>⬅ Previous</button>
+                    <button class="btn btn-success" onclick="studyNext()" ${studyCurrentIndex === total-1 ? 'disabled' : ''}>Next ➡</button>
+                    <button class="btn btn-warning" onclick="bookmarkStudyQuestion()">⭐ Bookmark</button>
+                </div>
+            `;
+
+            container.innerHTML = html;
+            studyAnswered = false;
+
+            document.querySelectorAll('.study-option').forEach(el => {
+                el.classList.remove('correct', 'wrong', 'show-correct', 'disabled');
+            });
+            document.getElementById('studyExplain').style.display = 'none';
+
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        function checkStudyAnswer(letter) {
+            if (studyAnswered) return;
+            studyAnswered = true;
+
+            const q = studyQuestions[studyCurrentIndex];
+            const correctLetter = q.answer || 'a';
+
+            const options = document.querySelectorAll('.study-option');
+            options.forEach(el => {
+                const l = el.dataset.letter;
+                if (l === letter) {
+                    if (l === correctLetter) {
+                        el.classList.add('correct');
+                    } else {
+                        el.classList.add('wrong');
+                    }
+                }
+                if (l === correctLetter && l !== letter) {
+                    el.classList.add('show-correct');
+                }
+                el.classList.add('disabled');
+            });
+
+            const explainDiv = document.getElementById('studyExplain');
+            if (explainDiv) {
+                const textEl = document.getElementById('studyExplainText');
+                if (textEl) {
+                    const explanation = q.explanation || `The correct answer is option ${correctLetter.toUpperCase()}.`;
+                    textEl.textContent = explanation;
+                }
+                explainDiv.style.display = 'block';
+            }
+        }
+
+        function studyNext() {
+            if (studyCurrentIndex < studyQuestions.length - 1) {
+                studyCurrentIndex++;
+                renderStudyQuestion();
+                document.getElementById('studyQuizContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function studyPrev() {
+            if (studyCurrentIndex > 0) {
+                studyCurrentIndex--;
+                renderStudyQuestion();
+                document.getElementById('studyQuizContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function bookmarkStudyQuestion() {
+            if (!currentUser || currentUser.role !== 'student') return;
+            const q = studyQuestions[studyCurrentIndex];
+            if (!q) return;
+
+            const students = DB.get('students', []);
+            const idx = students.findIndex(s => s.mobile === currentUser.data.mobile);
+            if (idx !== -1) {
+                if (!students[idx].savedQuestions) students[idx].savedQuestions = [];
+                if (!students[idx].savedQuestions.some(sq => sq.id === q.id)) {
+                    students[idx].savedQuestions.push(q);
+                    DB.set('students', students);
+                    alert('⭐ Question bookmarked!');
+                } else {
+                    alert('⚠️ Question already bookmarked!');
+                }
+            }
+        }
+
+        function exitStudyMode() {
+            document.getElementById('studyHeader').style.display = 'none';
+            document.getElementById('studyQuizContainer').innerHTML = '';
+            studyQuestions = [];
+            studyCurrentIndex = 0;
+            studyAnswered = false;
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.panel-content').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel-student-study').classList.add('active');
+            document.querySelector('[data-panel="student-study"]')?.classList.add('active');
+            updateStudySelects();
+        }
+
+        // ============================================================
+        // PRACTICE MODE - CUSTOM TIME TOGGLE
+        // ============================================================
+        function togglePracticeCustomTime() {
+            const sel = document.getElementById('practicePerQTimer');
+            const group = document.getElementById('practiceCustomTimeGroup');
+            if (sel.value === 'custom') {
+                group.classList.add('show');
+            } else {
+                group.classList.remove('show');
+            }
+        }
+
+        // ============================================================
+        // MOCK TEST SETTINGS - TIME CALCULATION
+        // ============================================================
+        function updateMockTotalTime() {
+            const qCount = parseInt(document.getElementById('mockQCount').value) || 20;
+            const perQSelect = document.getElementById('mockPerQTimer').value;
+            const totalTimeGroup = document.getElementById('mockTotalTimeGroup');
+            const customTimeGroup = document.getElementById('mockCustomTimeGroup');
+
+            totalTimeGroup.style.display = 'none';
+            customTimeGroup.style.display = 'none';
+
+            if (perQSelect === 'total') {
+                totalTimeGroup.style.display = 'block';
+                const totalMin = parseInt(document.getElementById('mockTotalTimeInput').value) || 30;
+                const totalSec = totalMin * 60;
+                const perQSec = Math.round(totalSec / (qCount > 0 ? qCount : 20));
+                document.getElementById('mockPerQTimeDisplay').textContent =
+                    `${perQSec} seconds (from ${totalMin} min total)`;
+            } else if (perQSelect === 'custom') {
+                customTimeGroup.style.display = 'block';
+                const customSec = parseInt(document.getElementById('mockCustomTime').value) || 30;
+                document.getElementById('mockPerQTimeDisplay').textContent = `${customSec} seconds (Custom)`;
+            } else {
+                const perQTime = parseInt(perQSelect) || 0;
+                document.getElementById('mockPerQTimeDisplay').textContent =
+                    perQTime > 0 ? `${perQTime} seconds` : 'No Time Limit';
+            }
+        }
+
+        function updateMockChapterTotalTime() {
+            const qCount = parseInt(document.getElementById('mockChapterQCount').value) || 20;
+            const perQSelect = document.getElementById('mockChapterPerQTimer').value;
+            const totalTimeGroup = document.getElementById('mockChapterTotalTimeGroup');
+            const customTimeGroup = document.getElementById('mockChapterCustomTimeGroup');
+
+            totalTimeGroup.style.display = 'none';
+            customTimeGroup.style.display = 'none';
+
+            if (perQSelect === 'total') {
+                totalTimeGroup.style.display = 'block';
+                const totalMin = parseInt(document.getElementById('mockChapterTotalTimeInput').value) || 30;
+                const totalSec = totalMin * 60;
+                const perQSec = Math.round(totalSec / (qCount > 0 ? qCount : 20));
+                document.getElementById('mockChapterPerQTimeDisplay').textContent =
+                    `${perQSec} seconds (from ${totalMin} min total)`;
+            } else if (perQSelect === 'custom') {
+                customTimeGroup.style.display = 'block';
+                const customSec = parseInt(document.getElementById('mockChapterCustomTime').value) || 30;
+                document.getElementById('mockChapterPerQTimeDisplay').textContent = `${customSec} seconds (Custom)`;
+            } else {
+                const perQTime = parseInt(perQSelect) || 0;
+                document.getElementById('mockChapterPerQTimeDisplay').textContent =
+                    perQTime > 0 ? `${perQTime} seconds` : 'No Time Limit';
+            }
+        }
+
+        // Event listeners for mock settings
+        document.getElementById('mockPerQTimer')?.addEventListener('change', updateMockTotalTime);
+        document.getElementById('mockTotalTimeInput')?.addEventListener('change', updateMockTotalTime);
+        document.getElementById('mockCustomTime')?.addEventListener('change', updateMockTotalTime);
+        document.getElementById('mockQCount')?.addEventListener('change', updateMockTotalTime);
+
+        document.getElementById('mockChapterPerQTimer')?.addEventListener('change', updateMockChapterTotalTime);
+        document.getElementById('mockChapterTotalTimeInput')?.addEventListener('change', updateMockChapterTotalTime);
+        document.getElementById('mockChapterCustomTime')?.addEventListener('change', updateMockChapterTotalTime);
+        document.getElementById('mockChapterQCount')?.addEventListener('change', updateMockChapterTotalTime);
+
+        // Negative marking custom toggle
+        document.getElementById('mockNegative')?.addEventListener('change', function() {
+            document.getElementById('mockCustomNegGroup').style.display = this.value === 'custom' ? 'block' : 'none';
+        });
+        document.getElementById('mockChapterNegative')?.addEventListener('change', function() {
+            document.getElementById('mockChapterCustomNegGroup').style.display = this.value === 'custom' ? 'block' :
+                'none';
+        });
+
+        // ============================================================
+        // ADD FUNCTIONS
+        // ============================================================
+        function addNewSubject() {
+            const input = document.getElementById('newSubjectInput');
+            if (addSubject(input.value)) { input.value = '';
+                updateSubjectSelects();
+                showStatus('uploadStatus', '✅ Subject added!', 'success'); } else showStatus('uploadStatus',
+                '❌ Already exists!', 'error');
+        }
+
+        function addNewChapter() {
+            const subject = document.getElementById('uploadSubject').value;
+            const input = document.getElementById('newChapterInput');
+            if (!subject) { showStatus('uploadStatus', '❌ Select subject first!', 'error'); return; }
+            if (addChapter(subject, input.value)) { input.value = '';
+                updateChapterSelects(subject);
+                showStatus('uploadStatus', '✅ Chapter added!', 'success'); } else showStatus('uploadStatus',
+                '❌ Already exists!', 'error');
+        }
+
+        function addNewTopic() {
+            const chapter = document.getElementById('uploadChapter').value;
+            const input = document.getElementById('newTopicInput');
+            if (!chapter) { showStatus('uploadStatus', '❌ Select chapter first!', 'error'); return; }
+            if (addTopic(chapter, input.value)) { input.value = '';
+                updateTopicSelects(chapter);
+                showStatus('uploadStatus', '✅ Topic added!', 'success'); } else showStatus('uploadStatus',
+                '❌ Already exists!', 'error');
+        }
+
+        // ============================================================
+        // HTML PARSER - FIXED WITH UPLOAD ORDER
+        // ============================================================
+        function parseHTMLAndUpload() {
+            const subject = document.getElementById('uploadSubject').value;
+            const chapter = document.getElementById('uploadChapter').value;
+            const topic = document.getElementById('uploadTopic').value;
+            const html = document.getElementById('htmlCodeInput').value;
+            if (!subject || !chapter || !topic) { showStatus('uploadStatus', '❌ Select Subject, Chapter, Topic!',
+                    'error'); return; }
+            if (!html.trim()) { showStatus('uploadStatus', '❌ Paste HTML code!', 'error'); return; }
+
+            const questions = parseHTMLQuestions(html);
+            if (questions.length === 0) { showStatus('uploadStatus', '❌ No questions found!', 'error'); return; }
+
+            const existing = DB.get('questions', []);
+            const startOrder = existing.length;
+
+            const newQ = questions.map((q, index) => ({
+                id: Date.now() + index,
+                uploadOrder: startOrder + index + 1,
+                subject: subject,
+                chapter: chapter,
+                topic: topic,
+                question: q.text,
+                hindi: q.hindi || '',
+                option_a: q.options[0] || '',
+                option_b: q.options[1] || '',
+                option_c: q.options[2] || '',
+                option_d: q.options[3] || '',
+                answer: q.answer || '',
+                source: q.source || '',
+                explanation: q.explanation || ''
+            }));
+
+            DB.set('questions', [...existing, ...newQ]);
+            showStatus('uploadStatus', `✅ ${newQ.length} questions uploaded!`, 'success');
+            document.getElementById('htmlCodeInput').value = '';
+            loadAllData();
+        }
+
+        function parseHTMLQuestions(html) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const body = doc.body || doc;
+            const questions = [];
+
+            const items = body.querySelectorAll('.question-item');
+            items.forEach(item => {
+                const qLine = item.querySelector('.question-line');
+                const engText = item.querySelector('.question-text') || qLine;
+                const hindiText = item.querySelector('.eng-text');
+                const options = [];
+                const optSpans = item.querySelectorAll('.options-row .option');
+                optSpans.forEach(opt => options.push(fixMath(opt.innerText.trim())));
+                const sourceEl = item.querySelector('.exam-source');
+                const source = sourceEl ? sourceEl.innerText.trim() : '';
+                let qText = engText ? fixMath(engText.innerText.trim()) : '';
+                let hindi = hindiText ? fixMath(hindiText.innerText.trim()) : '';
+                if (qText && options.length >= 4) {
+                    questions.push({ text: qText, hindi: hindi, options: options.slice(0, 4), source: source,
+                        answer: '', explanation: '' });
+                }
+            });
+
+            const tables = body.querySelectorAll('table');
+            tables.forEach(table => {
+                const rows = table.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    cells.forEach(cell => {
+                        const text = cell.innerText.trim();
+                        const match = text.match(/(\d+)\.\(([a-d])\)/i);
+                        if (match) {
+                            const qNum = parseInt(match[1]);
+                            const ans = match[2].toLowerCase();
+                            if (questions[qNum - 1]) questions[qNum - 1].answer = ans;
+                        }
+                    });
+                });
+            });
+
+            return questions;
+        }
+
+        function showStatus(id, msg, type) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.innerHTML = `<div class="status-${type}">${msg}</div>`;
+            setTimeout(() => el.innerHTML = '', 8000);
+        }
+
+        // ============================================================
+        // QUESTION MANAGEMENT (Admin) - WITH EDIT
+        // ============================================================
+        function viewAllQuestions() {
+            const q = DB.get('questions', []);
+            const c = document.getElementById('questionListContainer');
+            if (!q.length) { c.innerHTML = '<p style="color:#94a3b8;">No questions.</p>'; return; }
+            let html = `<div class="table-wrap"><table>
+                <tr><th>#</th><th>Subject</th><th>Chapter</th><th>Topic</th><th>Question</th><th>Actions</th></tr>`;
+            q.forEach((q, i) => {
+                html += `<tr>
+                    <td>${i+1}</td>
+                    <td>${q.subject||'-'}</td>
+                    <td>${q.chapter||'-'}</td>
+                    <td>${q.topic||'-'}</td>
+                    <td style="cursor:pointer;color:#3b82f6;" onclick="editQuestion(${i})">${q.question.substring(0,50)}${q.question.length>50?'...':''}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="editQuestion(${i})">✏️ Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteQuestion(${i})">Delete</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</table></div>';
+            c.innerHTML = html;
+        }
+
+        function editQuestion(index) {
+            const questions = DB.get('questions', []);
+            const q = questions[index];
+            if (!q) return;
+
+            const html = `
+                <div class="form-group">
+                    <label class="form-label">Subject</label>
+                    <input type="text" id="editQSubject" class="form-input" value="${escapeHtml(q.subject||'')}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Chapter</label>
+                    <input type="text" id="editQChapter" class="form-input" value="${escapeHtml(q.chapter||'')}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Topic</label>
+                    <input type="text" id="editQTopic" class="form-input" value="${escapeHtml(q.topic||'')}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Question (English)</label>
+                    <textarea id="editQText" class="form-textarea" style="min-height:60px;">${escapeHtml(q.question)}</textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Question (Hindi)</label>
+                    <textarea id="editQHindi" class="form-textarea" style="min-height:40px;">${escapeHtml(q.hindi||'')}</textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Option A</label>
+                    <input type="text" id="editQA" class="form-input" value="${escapeHtml(q.option_a||'')}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Option B</label>
+                    <input type="text" id="editQB" class="form-input" value="${escapeHtml(q.option_b||'')}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Option C</label>
+                    <input type="text" id="editQC" class="form-input" value="${escapeHtml(q.option_c||'')}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Option D</label>
+                    <input type="text" id="editQD" class="form-input" value="${escapeHtml(q.option_d||'')}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Correct Answer (a/b/c/d)</label>
+                    <input type="text" id="editQAnswer" class="form-input" value="${escapeHtml(q.answer||'')}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Source</label>
+                    <input type="text" id="editQSource" class="form-input" value="${escapeHtml(q.source||'')}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Explanation (Optional)</label>
+                    <textarea id="editQExplanation" class="form-textarea" style="min-height:40px;">${escapeHtml(q.explanation||'')}</textarea>
+                </div>
+                <button class="btn btn-success w-full" onclick="saveEditedQuestion(${index})">💾 Save Changes</button>
+            `;
+
+            openModal('✏️ Edit Question', html);
+        }
+
+        function saveEditedQuestion(index) {
+            const questions = DB.get('questions', []);
+            questions[index] = {
+                ...questions[index],
+                subject: document.getElementById('editQSubject').value.trim(),
+                chapter: document.getElementById('editQChapter').value.trim(),
+                topic: document.getElementById('editQTopic').value.trim(),
+                question: document.getElementById('editQText').value.trim(),
+                hindi: document.getElementById('editQHindi').value.trim(),
+                option_a: document.getElementById('editQA').value.trim(),
+                option_b: document.getElementById('editQB').value.trim(),
+                option_c: document.getElementById('editQC').value.trim(),
+                option_d: document.getElementById('editQD').value.trim(),
+                answer: document.getElementById('editQAnswer').value.trim().toLowerCase(),
+                source: document.getElementById('editQSource').value.trim(),
+                explanation: document.getElementById('editQExplanation').value.trim()
+            };
+            DB.set('questions', questions);
+            closeModal();
+            viewAllQuestions();
+            loadAllData();
+            alert('✅ Question updated successfully!');
+        }
+
+        function deleteQuestion(i) {
+            if (!confirm('Delete this question?')) return;
+            const q = DB.get('questions', []);
+            q.splice(i, 1);
+            DB.set('questions', q);
+            viewAllQuestions();
+            loadAllData();
+        }
+
+        function deleteAllQuestions() {
+            if (!confirm('Delete ALL questions?')) return;
+            DB.set('questions', []);
+            viewAllQuestions();
+            loadAllData();
+        }
+
+        function exportQuestions() {
+            const q = DB.get('questions', []);
+            if (!q.length) { alert('No questions!'); return; }
+            const blob = new Blob([JSON.stringify(q, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `questions_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // ============================================================
+        // STUDENT MANAGEMENT (Admin) - WITH EDIT
+        // ============================================================
+        function addStudent() {
+            const name = document.getElementById('studentName').value.trim();
+            const mobile = document.getElementById('studentMobile').value.trim();
+            const father = document.getElementById('studentFather').value.trim();
+            const village = document.getElementById('studentVillage').value.trim();
+            const password = document.getElementById('studentPassword').value.trim();
+            if (!name || !mobile || !password) { alert('Fill Name, Mobile, Password!'); return; }
+            const students = DB.get('students', []);
+            if (students.some(s => s.mobile === mobile)) { alert('Mobile already exists!'); return; }
+            students.push({ name, mobile, father, village, password, banned: false, stats: { totalAttempted: 0,
+                    correct: 0, wrong: 0, accuracy: 0 }, wrongQuestions: [], savedQuestions: [],
+                examHistory: [] });
+            DB.set('students', students);
+            document.getElementById('studentName').value = '';
+            document.getElementById('studentMobile').value = '';
+            document.getElementById('studentFather').value = '';
+            document.getElementById('studentVillage').value = '';
+            document.getElementById('studentPassword').value = '';
+            updateStudentList();
+            loadAllData();
+            alert('✅ Student added!');
+        }
+
+        function updateStudentList() {
+            const students = DB.get('students', []);
+            const c = document.getElementById('studentListContainer');
+            if (!students.length) { c.innerHTML = '<p style="color:#94a3b8;">No students.</p>'; return; }
+            let html = `<div class="table-wrap"><table>
+                <tr><th>Name</th><th>Mobile</th><th>Father</th><th>Village</th><th>Status</th><th>Actions</th></tr>`;
+            students.forEach((s, i) => {
+                html += `<tr>
+                    <td style="cursor:pointer;color:#3b82f6;" onclick="editStudent(${i})">${s.name}</td>
+                    <td>${s.mobile}</td>
+                    <td>${s.father||'-'}</td>
+                    <td>${s.village||'-'}</td>
+                    <td><span style="padding:2px 12px;border-radius:20px;background:${s.banned?'#ef444422':'#10b98122'};color:${s.banned?'#ef4444':'#10b981'};">${s.banned?'Banned':'Active'}</span></td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="editStudent(${i})">✏️ Edit</button>
+                        <button class="btn btn-sm ${s.banned?'btn-success':'btn-warning'}" onclick="toggleBan(${i})">${s.banned?'Unban':'Ban'}</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteStudent(${i})">Delete</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</table></div>';
+            c.innerHTML = html;
+        }
+
+        function editStudent(index) {
+            const students = DB.get('students', []);
+            const s = students[index];
+            if (!s) return;
+
+            const html = `
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" id="editSName" class="form-input" value="${escapeHtml(s.name)}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Mobile</label>
+                    <input type="text" id="editSMobile" class="form-input" value="${escapeHtml(s.mobile)}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Father's Name</label>
+                    <input type="text" id="editSFather" class="form-input" value="${escapeHtml(s.father||'')}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Village</label>
+                    <input type="text" id="editSVillage" class="form-input" value="${escapeHtml(s.village||'')}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="text" id="editSPassword" class="form-input" value="${escapeHtml(s.password)}">
+                </div>
+                <button class="btn btn-success w-full" onclick="saveEditedStudent(${index})">💾 Save Changes</button>
+            `;
+
+            openModal('✏️ Edit Student', html);
+        }
+
+        function saveEditedStudent(index) {
+            const students = DB.get('students', []);
+            students[index] = {
+                ...students[index],
+                name: document.getElementById('editSName').value.trim(),
+                mobile: document.getElementById('editSMobile').value.trim(),
+                father: document.getElementById('editSFather').value.trim(),
+                village: document.getElementById('editSVillage').value.trim(),
+                password: document.getElementById('editSPassword').value.trim()
+            };
+            DB.set('students', students);
+            closeModal();
+            updateStudentList();
+            loadAllData();
+            alert('✅ Student updated successfully!');
+        }
+
+        function toggleBan(i) {
+            const s = DB.get('students', []);
+            s[i].banned = !s[i].banned;
+            DB.set('students', s);
+            updateStudentList();
+        }
+
+        function deleteStudent(i) {
+            if (!confirm('Delete student?')) return;
+            const s = DB.get('students', []);
+            s.splice(i, 1);
+            DB.set('students', s);
+            updateStudentList();
+            loadAllData();
+        }
+
+        // ============================================================
+        // EXAM MANAGEMENT (Admin)
+        // ============================================================
+        function createExam() {
+            const name = document.getElementById('examName').value.trim();
+            const qCount = parseInt(document.getElementById('examQuestions').value);
+            const time = parseInt(document.getElementById('examTime').value);
+            const negative = parseFloat(document.getElementById('examNegative').value) || 0;
+            const subject = document.getElementById('examSubject').value;
+            const chapter = document.getElementById('examChapter').value;
+            const topic = document.getElementById('examTopic').value;
+            const shuffle = document.getElementById('examShuffle').checked;
+            if (!name || !qCount || !time || !subject) { alert('Fill all required fields!'); return; }
+            const exams = DB.get('exams', []);
+            exams.push({ id: Date.now(), name, qCount, time, negative, subject, chapter, topic, shuffle,
+                createdAt: new Date().toISOString(), attempts: 0 });
+            DB.set('exams', exams);
+            document.getElementById('examName').value = '';
+            document.getElementById('examQuestions').value = '';
+            document.getElementById('examTime').value = '';
+            updateExamLists();
+            loadAllData();
+            alert('✅ Exam created!');
+        }
+
+        function updateExamLists() {
+            const exams = DB.get('exams', []);
+            const c = document.getElementById('examList');
+            if (!exams.length) { c.innerHTML = '<p style="color:#94a3b8;">No exams.</p>'; return; }
+            let html = '';
+            exams.forEach((e, i) => {
+                html +=
+                    `<div style="background:#0f172a;padding:10px;border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                        <div><strong>${e.name}</strong><br><small style="color:#94a3b8;">${e.qCount} Qs | ${e.time} min | ${e.subject}</small></div>
+                        <button class="btn btn-danger btn-sm" onclick="deleteExam(${i})">Delete</button>
+                    </div>`;
+            });
+            c.innerHTML = html;
+        }
+
+        function deleteExam(i) {
+            if (!confirm('Delete exam?')) return;
+            const e = DB.get('exams', []);
+            e.splice(i, 1);
+            DB.set('exams', e);
+            updateExamLists();
+        }
+
+        // ============================================================
+        // STUDENT PANEL FUNCTIONS
+        // ============================================================
+        function updateStudentDashboard() {
+            if (!currentUser || currentUser.role !== 'student') return;
+            const s = currentUser.data;
+            const stats = s.stats || { totalAttempted: 0, correct: 0, wrong: 0, accuracy: 0 };
+            document.getElementById('sTotalAttempted').textContent = stats.totalAttempted || 0;
+            document.getElementById('sCorrect').textContent = stats.correct || 0;
+            document.getElementById('sWrong').textContent = stats.wrong || 0;
+            document.getElementById('sAccuracy').textContent = (stats.accuracy || 0) + '%';
+        }
+
+        function updateExamListStudent() {
+            const exams = DB.get('exams', []);
+            const c = document.getElementById('availableExams');
+            if (!exams.length) { c.innerHTML = '<p style="color:#94a3b8;">No exams available.</p>'; return; }
+            let html = '<div class="card-grid">';
+            exams.forEach((e, i) => {
+                html += `<div class="card">
+                    <div class="card-title">${e.name}</div>
+                    <div style="color:#94a3b8;font-size:0.85rem;">📚 ${e.subject} ${e.chapter?'| '+e.chapter:''}<br>📝 ${e.qCount} Qs | ⏱ ${e.time} min ${e.negative?'| 📉 -'+e.negative:''}</div>
+                    <button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%;" onclick="startExam(${i})">▶ Start Exam</button>
+                </div>`;
+            });
+            html += '</div>';
+            c.innerHTML = html;
+        }
+
+        // ============================================================
+        // QUIZ ENGINE
+        // ============================================================
+        let quizQuestions = [];
+        let quizAnswers = [];
+        let quizSubmitted = false;
+        let quizTimerInterval = null;
+        let questionTimerInterval = null;
+        let quizTotalTime = 0;
+        let quizRemainingTime = 0;
+        let questionTimeLimit = 0;
+        let currentQuestionIndex = 0;
+        let quizExamName = '';
+        let quizNegative = 0;
+        let quizContainerId = 'practiceQuizContainer';
+
+        function startQuizUI(questions, settings) {
+            if (!questions || !questions.length) { alert('No questions available!'); return; }
+
+            if (quizTimerInterval) clearInterval(quizTimerInterval);
+            if (questionTimerInterval) clearInterval(questionTimerInterval);
+            quizSubmitted = false;
+            quizQuestions = questions;
+            quizAnswers = new Array(questions.length).fill(null);
+            currentQuestionIndex = 0;
+            quizNegative = settings.negative || 0;
+            quizExamName = settings.examName || 'Quiz';
+
+            const perQTime = settings.perQuestionTime || 0;
+            questionTimeLimit = perQTime;
+            const totalTime = settings.totalTime || (perQTime > 0 ? perQTime * questions.length : 0);
+            quizTotalTime = totalTime;
+            quizRemainingTime = totalTime;
+
+            const header = document.getElementById('quizStickyHeader');
+            header.style.display = 'flex';
+            document.getElementById('quizHeaderTitle').textContent = '📝 ' + quizExamName;
+
+            let container = null;
+            const activePanel = document.querySelector('.panel-content.active');
+            if (activePanel) {
+                const containers = activePanel.querySelectorAll('#practiceQuizContainer, #mockQuizContainer, #questionsContainer');
+                if (containers.length > 0) {
+                    container = containers[0];
+                    quizContainerId = container.id;
+                } else {
+                    container = document.createElement('div');
+                    container.id = 'quizQuestionsContainer';
+                    container.style.marginTop = '20px';
+                    container.style.display = 'block';
+                    activePanel.appendChild(container);
+                    quizContainerId = 'quizQuestionsContainer';
+                }
+            }
+
+            if (!container) {
+                const ids = ['practiceQuizContainer', 'mockQuizContainer', 'questionsContainer'];
+                for (let id of ids) {
+                    const el = document.getElementById(id);
+                    if (el) { container = el;
+                        quizContainerId = id; break; }
+                }
+            }
+
+            if (!container) { console.error('❌ No container found!'); return; }
+
+            container.style.display = 'block';
+            container.style.visibility = 'visible';
+            container.style.opacity = '1';
+            container.style.minHeight = '200px';
+            container.innerHTML = '';
+
+            renderQuizQuestions(container);
+
+            if (totalTime > 0) startTotalTimer(totalTime);
+            if (perQTime > 0) startQuestionTimer(perQTime);
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderQuizQuestions(container) {
+            if (!container) {
+                container = document.getElementById(quizContainerId);
+                if (!container) {
+                    const ids = ['practiceQuizContainer', 'mockQuizContainer', 'questionsContainer'];
+                    for (let id of ids) {
+                        const el = document.getElementById(id);
+                        if (el && el.style.display !== 'none') { container = el; break; }
+                    }
+                }
+            }
+            if (!container) { console.error('❌ No container available!'); return; }
+
+            container.style.display = 'block';
+            container.style.visibility = 'visible';
+            container.style.opacity = '1';
+            container.style.minHeight = '200px';
+
+            let html = '';
+            quizQuestions.forEach((q, idx) => {
+                const answered = quizAnswers[idx] !== null;
+                html += `
+                    <div class="question-card" id="qcard_${idx}">
+                        <div class="q-header">
+                            <span class="q-num">Q${idx+1} / ${quizQuestions.length}</span>
+                            <span class="q-timer" id="qtimer_${idx}">${questionTimeLimit > 0 ? questionTimeLimit+'s' : '--'}</span>
+                        </div>
+                        <div class="q-text">${escapeHtml(q.question)}</div>
+                        ${q.hindi ? `<div class="q-hindi">${escapeHtml(q.hindi)}</div>` : ''}
+                        <div>
+                            ${['a','b','c','d'].map(letter => {
+                                const opt = q['option_'+letter] || '';
+                                return opt ? `
+                                    <div class="option" onclick="selectAnswer(${idx}, '${letter}')">
+                                        <input type="radio" name="q_${idx}" id="q${idx}_${letter}" value="${letter}" ${quizAnswers[idx] === letter ? 'checked' : ''} ${quizSubmitted ? 'disabled' : ''}>
+                                        <label for="q${idx}_${letter}">${escapeHtml(opt)}</label>
+                                    </div>
+                                ` : '';
+                            }).join('')}
+                        </div>
+                        ${q.source ? `<div class="q-source">📚 ${escapeHtml(q.source)}</div>` : ''}
+                        <div style="margin-top:8px;font-size:0.75rem;color:#64748b;">
+                            ${answered ? '✅ Answered' : '⏳ Pending'}
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                <div style="display:flex;gap:15px;justify-content:center;margin-top:20px;flex-wrap:wrap;padding-bottom:30px;">
+                    <button class="btn btn-success" onclick="submitQuiz()" id="submitQuizBtn" style="padding:12px 30px;border:none;border-radius:10px;background:#10b981;color:white;font-weight:600;cursor:pointer;font-size:1rem;">✅ Submit Quiz</button>
+                    <button class="btn btn-danger" onclick="exitQuiz()" style="padding:12px 30px;border:none;border-radius:10px;background:#ef4444;color:white;font-weight:600;cursor:pointer;font-size:1rem;">🚪 Exit Quiz</button>
+                </div>
+                <div id="quizResultContainer" style="margin-top:20px;"></div>
+            `;
+
+            container.innerHTML = html;
+            updateQuizProgress();
+
+            if (window.MathJax) MathJax.typesetPromise();
+
+            const firstUnanswered = quizAnswers.findIndex(a => a === null);
+            if (firstUnanswered !== -1) {
+                const card = document.getElementById(`qcard_${firstUnanswered}`);
+                if (card) setTimeout(() => card.scrollIntoView({ behavior: 'smooth', block: 'center' }), 400);
+            }
+        }
+
+        function selectAnswer(idx, letter) {
+            if (quizSubmitted) return;
+            quizAnswers[idx] = letter;
+            const radio = document.getElementById(`q${idx}_${letter}`);
+            if (radio) radio.checked = true;
+            const card = document.getElementById(`qcard_${idx}`);
+            if (card) {
+                const status = card.querySelector('div:last-child');
+                if (status) status.innerHTML = '✅ Answered';
+            }
+            updateQuizProgress();
+
+            const allAnswered = quizAnswers.every(a => a !== null);
+            if (allAnswered && !quizSubmitted) {
+                setTimeout(() => { if (!quizSubmitted) submitQuiz(); }, 1500);
+            }
+        }
+
+        function updateQuizProgress() {
+            const answered = quizAnswers.filter(a => a !== null).length;
+            const total = quizQuestions.length;
+            const pct = total > 0 ? Math.round((answered / total) * 100) : 0;
+            document.getElementById('quizProgressDisplay').textContent = `${answered}/${total} (${pct}%)`;
+        }
+
+        function startTotalTimer(seconds) {
+            if (quizTimerInterval) clearInterval(quizTimerInterval);
+            let remaining = seconds;
+
+            function update() {
+                const m = Math.floor(remaining / 60);
+                const s = remaining % 60;
+                document.getElementById('totalTimerDisplay').textContent =
+                    `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+
+                if (remaining <= 60) {
+                    document.getElementById('totalTimerDisplay').style.color = '#ef4444';
+                } else {
+                    document.getElementById('totalTimerDisplay').style.color = '#3b82f6';
+                }
+
+                if (remaining <= 0) {
+                    clearInterval(quizTimerInterval);
+                    if (!quizSubmitted) { alert('⏰ Time is up! Auto-submitting...');
+                        submitQuiz(); }
+                }
+                remaining--;
+            }
+
+            update();
+            quizTimerInterval = setInterval(update, 1000);
+        }
+
+        function startQuestionTimer(seconds) {
+            if (questionTimerInterval) clearInterval(questionTimerInterval);
+            let remaining = seconds;
+
+            function update() {
+                const total = quizQuestions.length;
+                for (let i = 0; i < total; i++) {
+                    const el = document.getElementById(`qtimer_${i}`);
+                    if (el) {
+                        if (quizAnswers[i] !== null) {
+                            el.textContent = '✅ Done';
+                            el.style.color = '#10b981';
+                            el.classList.remove('warning');
+                        } else if (i === currentQuestionIndex) {
+                            el.textContent = remaining + 's';
+                            el.style.color = remaining <= 10 ? '#ef4444' : '#10b981';
+                            if (remaining <= 10) el.classList.add('warning');
+                            else el.classList.remove('warning');
+                            document.getElementById('questionTimerDisplay').textContent = remaining + 's';
+                            document.getElementById('questionTimerDisplay').style.color = remaining <= 10 ? '#ef4444' :
+                                '#10b981';
+                        } else {
+                            el.textContent = '--';
+                            el.style.color = '#64748b';
+                            el.classList.remove('warning');
+                        }
+                    }
+                }
+
+                if (remaining <= 0) {
+                    const nextQ = findNextUnanswered(currentQuestionIndex + 1);
+                    if (nextQ !== -1) {
+                        currentQuestionIndex = nextQ;
+                        remaining = seconds;
+                        const card = document.getElementById(`qcard_${currentQuestionIndex}`);
+                        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    } else {
+                        clearInterval(questionTimerInterval);
+                        document.getElementById('questionTimerDisplay').textContent = '✅';
+                        const allAnswered = quizAnswers.every(a => a !== null);
+                        if (allAnswered && !quizSubmitted) {
+                            setTimeout(() => { if (!quizSubmitted) submitQuiz(); }, 1000);
+                        }
+                        return;
+                    }
+                }
+                remaining--;
+            }
+
+            const firstUnanswered = quizAnswers.findIndex(a => a === null);
+            if (firstUnanswered !== -1) currentQuestionIndex = firstUnanswered;
+            document.getElementById('questionTimerDisplay').textContent = seconds + 's';
+
+            update();
+            questionTimerInterval = setInterval(update, 1000);
+        }
+
+        function findNextUnanswered(start) {
+            for (let i = start; i < quizQuestions.length; i++) {
+                if (quizAnswers[i] === null) return i;
+            }
+            return -1;
+        }
+
+        function submitQuiz() {
+            if (quizSubmitted) return;
+            quizSubmitted = true;
+
+            if (quizTimerInterval) { clearInterval(quizTimerInterval);
+                quizTimerInterval = null; }
+            if (questionTimerInterval) { clearInterval(questionTimerInterval);
+                questionTimerInterval = null; }
+
+            const questions = quizQuestions;
+            const answers = quizAnswers;
+            const negative = quizNegative;
+
+            let correct = 0,
+                wrong = 0,
+                unattempted = 0,
+                totalScore = 0;
+
+            questions.forEach((q, idx) => {
+                const userAns = answers[idx];
+                if (userAns === null) {
+                    unattempted++;
+                } else if (userAns === q.answer) {
+                    correct++;
+                    totalScore += 1;
+                } else {
+                    wrong++;
+                    totalScore -= negative;
+                }
+            });
+
+            const total = questions.length;
+            const accuracy = (correct + wrong) > 0 ? Math.round((correct / (correct + wrong)) * 100) : 0;
+
+            let resultHtml = `
+                <div style="background:#0f172a;padding:20px;border-radius:16px;margin-top:20px;">
+                    <h3 style="color:#fff;margin-bottom:15px;">📊 Quiz Results - ${quizExamName}</h3>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;margin-bottom:15px;">
+                        <div style="background:#1e293b;padding:10px;border-radius:10px;text-align:center;">
+                            <div style="color:#94a3b8;font-size:0.8rem;">Score</div>
+                            <div style="color:#10b981;font-size:1.5rem;font-weight:bold;">${totalScore.toFixed(2)}</div>
+                        </div>
+                        <div style="background:#1e293b;padding:10px;border-radius:10px;text-align:center;">
+                            <div style="color:#94a3b8;font-size:0.8rem;">Accuracy</div>
+                            <div style="color:#3b82f6;font-size:1.5rem;font-weight:bold;">${accuracy}%</div>
+                        </div>
+                        <div style="background:#1e293b;padding:10px;border-radius:10px;text-align:center;">
+                            <div style="color:#94a3b8;font-size:0.8rem;">Correct</div>
+                            <div style="color:#10b981;font-size:1.5rem;font-weight:bold;">${correct}</div>
+                        </div>
+                        <div style="background:#1e293b;padding:10px;border-radius:10px;text-align:center;">
+                            <div style="color:#94a3b8;font-size:0.8rem;">Wrong</div>
+                            <div style="color:#ef4444;font-size:1.5rem;font-weight:bold;">${wrong}</div>
+                        </div>
+                        <div style="background:#1e293b;padding:10px;border-radius:10px;text-align:center;">
+                            <div style="color:#94a3b8;font-size:0.8rem;">Unattempted</div>
+                            <div style="color:#f59e0b;font-size:1.5rem;font-weight:bold;">${unattempted}</div>
+                        </div>
+                    </div>
+                    <div style="max-height:400px;overflow-y:auto;">
+            `;
+
+            questions.forEach((q, idx) => {
+                const userAns = answers[idx];
+                const isCorrect = userAns === q.answer;
+                let statusClass = 'unattempted',
+                    statusText = '❌ Unattempted';
+                if (userAns !== null) {
+                    statusClass = isCorrect ? 'correct' : 'wrong';
+                    statusText = isCorrect ? '✅ Correct' : '❌ Wrong';
+                }
+                resultHtml += `
+                    <div class="result-item ${statusClass}">
+                        <strong>Q${idx+1}</strong> ${statusText}<br>
+                        <span style="color:#94a3b8;font-size:0.85rem;">${escapeHtml(q.question.substring(0,80))}${q.question.length>80?'...':''}</span><br>
+                        <span style="font-size:0.85rem;">Your answer: ${userAns !== null ? escapeHtml(q['option_'+userAns]||'N/A') : 'Not answered'}</span>
+                        ${userAns !== null && !isCorrect ? `<br><span style="color:#10b981;font-size:0.85rem;">Correct: ${escapeHtml(q['option_'+q.answer]||'N/A')}</span>` : ''}
+                    </div>
+                `;
+            });
+
+            resultHtml += `</div></div>`;
+
+            if (currentUser && currentUser.role === 'student') {
+                const students = DB.get('students', []);
+                const idx = students.findIndex(s => s.mobile === currentUser.data.mobile);
+                if (idx !== -1) {
+                    const s = students[idx];
+                    s.stats = s.stats || { totalAttempted: 0, correct: 0, wrong: 0, accuracy: 0 };
+                    s.stats.totalAttempted += total;
+                    s.stats.correct += correct;
+                    s.stats.wrong += wrong;
+                    s.stats.accuracy = s.stats.totalAttempted > 0 ?
+                        Math.round((s.stats.correct / s.stats.totalAttempted) * 100) : 0;
+
+                    questions.forEach((q, i) => {
+                        if (answers[i] !== null && answers[i] !== q.answer) {
+                            if (!s.wrongQuestions) s.wrongQuestions = [];
+                            if (!s.wrongQuestions.some(w => w.id === q.id)) {
+                                s.wrongQuestions.push({ ...q, attemptedAnswer: answers[i] });
+                            }
+                        }
+                    });
+
+                    DB.set('students', students);
+                    currentUser.data = s;
+                }
+            }
+
+            const container = document.getElementById(quizContainerId) || document.getElementById('practiceQuizContainer') ||
+                document.getElementById('mockQuizContainer') || document.getElementById('questionsContainer');
+
+            if (container) container.innerHTML = resultHtml;
+
+            document.getElementById('totalTimerDisplay').textContent = '✅ Done';
+            document.getElementById('totalTimerDisplay').style.color = '#10b981';
+            document.getElementById('questionTimerDisplay').textContent = '✅';
+            document.getElementById('quizProgressDisplay').textContent = `${correct+wrong}/${total}`;
+
+            const submitBtn = document.getElementById('submitQuizBtn');
+            if (submitBtn) submitBtn.disabled = true;
+        }
+
+        function exitQuiz() {
+            if (!quizSubmitted && quizQuestions.length > 0) {
+                if (!confirm('Exit quiz? Your progress will be lost.')) return;
+            }
+            if (quizTimerInterval) { clearInterval(quizTimerInterval);
+                quizTimerInterval = null; }
+            if (questionTimerInterval) { clearInterval(questionTimerInterval);
+                questionTimerInterval = null; }
+            document.getElementById('quizStickyHeader').style.display = 'none';
+            quizQuestions = [];
+            quizAnswers = [];
+            quizSubmitted = false;
+
+            ['practiceQuizContainer', 'mockQuizContainer', 'questionsContainer'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = '';
+            });
+
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.panel-content').forEach(p => p.classList.remove('active'));
+            const firstTab = document.querySelector('.nav-tab:not([style*="display: none"])');
+            if (firstTab) firstTab.click();
+        }
+
+        // ============================================================
+        // SELECT QUESTIONS WITH PRIORITY
+        // ============================================================
+        function selectQuestionsWithPriority(allQuestions, requiredCount, priorityType, examId) {
+            const topicGroups = {};
+            allQuestions.forEach(q => {
+                const topic = q.topic || 'General';
+                if (!topicGroups[topic]) topicGroups[topic] = [];
+                topicGroups[topic].push(q);
+            });
+
+            const topics = Object.keys(topicGroups);
+            const totalRequired = Math.min(requiredCount, allQuestions.length);
+
+            let selected = [];
+            const perTopicCount = Math.floor(totalRequired / topics.length);
+            let remaining = totalRequired - (perTopicCount * topics.length);
+
+            topics.forEach((topic, index) => {
+                let topicQuestions = topicGroups[topic];
+                let count = perTopicCount;
+                if (remaining > 0 && index < remaining) count++;
+
+                let shuffled = shuffleArray(topicQuestions);
+
+                if (priorityType === 'student') {
+                    const studentHistory = currentUser?.data?.wrongQuestions || [];
+                    const attemptedIds = studentHistory.map(w => w.id);
+                    const unattempted = shuffled.filter(q => !attemptedIds.includes(q.id));
+                    const attempted = shuffled.filter(q => attemptedIds.includes(q.id));
+                    const takeFromUnattempted = Math.min(count, unattempted.length);
+                    selected = selected.concat(unattempted.slice(0, takeFromUnattempted));
+                    if (selected.length < count) {
+                        const remainingNeeded = count - selected.length;
+                        selected = selected.concat(attempted.slice(0, remainingNeeded));
+                    }
+                } else if (priorityType === 'admin') {
+                    const examHistory = DB.get('examHistory', []);
+                    const usedIds = [];
+                    examHistory.forEach(e => {
+                        if (e.id !== examId && e.subject === allQuestions[0]?.subject &&
+                            e.chapter === allQuestions[0]?.chapter) {
+                            usedIds.push(...e.questions);
+                        }
+                    });
+                    const unused = shuffled.filter(q => !usedIds.includes(q.id));
+                    const used = shuffled.filter(q => usedIds.includes(q.id));
+                    const takeFromUnused = Math.min(count, unused.length);
+                    selected = selected.concat(unused.slice(0, takeFromUnused));
+                    if (selected.length < count) {
+                        const remainingNeeded = count - selected.length;
+                        selected = selected.concat(used.slice(0, remainingNeeded));
+                    }
+                } else {
+                    selected = selected.concat(shuffled.slice(0, count));
+                }
+            });
+
+            return shuffleArray(selected);
+        }
+
+        // ============================================================
+        // START FUNCTIONS
+        // ============================================================
+
+        function startPracticeQuiz() {
+            const subject = document.getElementById('practiceSubject').value;
+            const chapter = document.getElementById('practiceChapter').value;
+            const topic = document.getElementById('practiceTopic').value;
+            const qCount = parseInt(document.getElementById('practiceQCount').value);
+            const negative = parseFloat(document.getElementById('practiceNegative').value);
+
+            const perQSelect = document.getElementById('practicePerQTimer').value;
+            let perQTimer = parseInt(perQSelect) || 0;
+            if (perQSelect === 'custom') {
+                perQTimer = parseInt(document.getElementById('practiceCustomTime').value) || 30;
+            }
+
+            if (!subject) { alert('Select a subject!'); return; }
+
+            let questions = DB.get('questions', []);
+            if (topic) questions = questions.filter(q => q.topic === topic);
+            else if (chapter) questions = questions.filter(q => q.chapter === chapter);
+            else if (subject) questions = questions.filter(q => q.subject === subject);
+
+            if (!questions.length) { alert('No questions found!'); return; }
+
+            const selected = selectQuestionsWithPriority(questions, qCount > 0 ? qCount : questions.length, 'student');
+            const totalTime = perQTimer > 0 ? perQTimer * selected.length : 0;
+
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.panel-content').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel-student-practice').classList.add('active');
+
+            quizContainerId = 'practiceQuizContainer';
+            startQuizUI(selected, { examName: 'Practice Quiz', totalTime: totalTime, perQuestionTime: perQTimer,
+                negative: negative });
+        }
+
+        function startExam(index) {
+            const exams = DB.get('exams', []);
+            const exam = exams[index];
+            if (!exam) return;
+
+            let questions = DB.get('questions', []);
+            if (exam.topic) questions = questions.filter(q => q.topic === exam.topic);
+            else if (exam.chapter) questions = questions.filter(q => q.chapter === exam.chapter);
+            else if (exam.subject) questions = questions.filter(q => q.subject === exam.subject);
+
+            if (!questions.length) { alert('No questions available!'); return; }
+
+            const selected = selectQuestionsWithPriority(questions, Math.min(exam.qCount, questions.length), 'admin', exam
+                .id);
+            if (exam.shuffle) shuffleArray(selected);
+
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.panel-content').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel-student-exams').classList.add('active');
+
+            quizContainerId = 'questionsContainer';
+            startQuizUI(selected, { examName: exam.name, totalTime: exam.time * 60, perQuestionTime: 0,
+                negative: exam.negative || 0 });
+        }
+
+        function startMockTest(type) {
+            let questions = DB.get('questions', []);
+            let name = 'Mock Test';
+            let qCount, perQTimer, negative;
+
+            if (type === 'subject') {
+                const subject = document.getElementById('mockSubject').value;
+                if (!subject) { alert('Select subject!'); return; }
+                questions = questions.filter(q => q.subject === subject);
+                name = subject + ' Mock Test';
+                qCount = parseInt(document.getElementById('mockQCount').value);
+                const perQSelect = document.getElementById('mockPerQTimer').value;
+
+                if (perQSelect === 'total') {
+                    const totalMin = parseInt(document.getElementById('mockTotalTimeInput').value) || 30;
+                    perQTimer = Math.round((totalMin * 60) / (qCount > 0 ? qCount : 20));
+                } else if (perQSelect === 'custom') {
+                    perQTimer = parseInt(document.getElementById('mockCustomTime').value) || 30;
+                } else {
+                    perQTimer = parseInt(perQSelect) || 0;
+                }
+
+                const negSelect = document.getElementById('mockNegative').value;
+                negative = negSelect === 'custom' ? parseFloat(document.getElementById('mockCustomNeg').value) || 0 :
+                    parseFloat(negSelect) || 0;
+            } else {
+                const subject = document.getElementById('mockChapterSubject').value;
+                const chapter = document.getElementById('mockChapter').value;
+                if (!subject || !chapter) { alert('Select subject and chapter!'); return; }
+                questions = questions.filter(q => q.subject === subject && q.chapter === chapter);
+                name = chapter + ' Mock Test';
+                qCount = parseInt(document.getElementById('mockChapterQCount').value);
+                const perQSelect = document.getElementById('mockChapterPerQTimer').value;
+
+                if (perQSelect === 'total') {
+                    const totalMin = parseInt(document.getElementById('mockChapterTotalTimeInput').value) || 30;
+                    perQTimer = Math.round((totalMin * 60) / (qCount > 0 ? qCount : 20));
+                } else if (perQSelect === 'custom') {
+                    perQTimer = parseInt(document.getElementById('mockChapterCustomTime').value) || 30;
+                } else {
+                    perQTimer = parseInt(perQSelect) || 0;
+                }
+
+                const negSelect = document.getElementById('mockChapterNegative').value;
+                negative = negSelect === 'custom' ? parseFloat(document.getElementById('mockChapterCustomNeg')
+                    .value) || 0 : parseFloat(negSelect) || 0;
+            }
+
+            if (!questions.length) { alert('No questions available!'); return; }
+
+            const selected = selectQuestionsWithPriority(questions, qCount > 0 ? qCount : questions.length, 'student');
+            const totalTime = perQTimer > 0 ? perQTimer * selected.length : 0;
+
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.panel-content').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel-student-mock').classList.add('active');
+
+            quizContainerId = 'mockQuizContainer';
+            startQuizUI(selected, { examName: name, totalTime: totalTime, perQuestionTime: perQTimer,
+            negative: negative });
+        }
+
+        // ============================================================
+        // STUDENT - WRONG QUESTIONS
+        // ============================================================
+        function showWrongQuestions(type) {
+            if (!currentUser || currentUser.role !== 'student') return;
+            const students = DB.get('students', []);
+            const student = students.find(s => s.mobile === currentUser.data.mobile);
+            if (!student) return;
+
+            let wrongQs = student.wrongQuestions || [];
+            const container = document.getElementById('wrongQuestionsContainer');
+
+            if (!wrongQs.length) {
+                container.innerHTML = '<p style="color:#94a3b8;">No wrong questions. Great job! 🎉</p>';
+                return;
+            }
+
+            let filtered = wrongQs;
+            if (type === 'last') filtered = wrongQs.slice(-5);
+
+            let html = `<p style="color:#94a3b8;margin-bottom:10px;">${filtered.length} wrong questions found.</p>`;
+            filtered.forEach((q, i) => {
+                html += `
+                    <div style="background:#0f172a;padding:12px;border-radius:10px;margin-bottom:8px;">
+                        <div style="font-weight:500;">Q${i+1}. ${escapeHtml(q.question)}</div>
+                        ${q.hindi ? `<div style="color:#94a3b8;font-size:0.85rem;">${escapeHtml(q.hindi)}</div>` : ''}
+                        <div style="color:#ef4444;font-size:0.85rem;">Your: ${q['option_'+q.attemptedAnswer]||'N/A'}</div>
+                        <div style="color:#10b981;font-size:0.85rem;">Correct: ${q.answer ? q['option_'+q.answer] : 'N/A'}</div>
+                        <button class="btn btn-primary btn-sm" style="margin-top:5px;" onclick="practiceWrongQuestion(${i})">Practice</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function practiceWrongQuestion(index) {
+            if (!currentUser) return;
+            const students = DB.get('students', []);
+            const student = students.find(s => s.mobile === currentUser.data.mobile);
+            if (!student) return;
+            const q = student.wrongQuestions[index];
+            if (!q) return;
+
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.panel-content').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel-student-wrong').classList.add('active');
+
+            quizContainerId = 'wrongQuestionsContainer';
+            startQuizUI([q], { examName: 'Wrong Question Practice', totalTime: 60, perQuestionTime: 60,
+            negative: 0 });
+        }
+
+        // ============================================================
+        // STUDENT - PROGRESS REPORT
+        // ============================================================
+        function showProgressReport() {
+            if (!currentUser || currentUser.role !== 'student') return;
+            const students = DB.get('students', []);
+            const student = students.find(s => s.mobile === currentUser.data.mobile);
+            if (!student) return;
+
+            const stats = student.stats || { totalAttempted: 0, correct: 0, wrong: 0, accuracy: 0 };
+            const container = document.getElementById('progressReport');
+
+            const allQuestions = DB.get('questions', []);
+            const wrongQs = student.wrongQuestions || [];
+
+            const subjectStats = {};
+            allQuestions.forEach(q => {
+                const subj = q.subject || 'Unknown';
+                if (!subjectStats[subj]) subjectStats[subj] = { total: 0, correct: 0 };
+                subjectStats[subj].total++;
+                const isWrong = wrongQs.some(w => w.id === q.id);
+                if (!isWrong) subjectStats[subj].correct++;
+            });
+
+            let html = `
+                <div class="card-grid">
+                    <div class="card"><div class="card-title">Overall Accuracy</div><div class="card-value">${stats.accuracy || 0}%</div></div>
+                    <div class="card"><div class="card-title">Total Attempted</div><div class="card-value">${stats.totalAttempted || 0}</div></div>
+                    <div class="card"><div class="card-title">Correct</div><div class="card-value">${stats.correct || 0}</div></div>
+                    <div class="card"><div class="card-title">Wrong</div><div class="card-value">${stats.wrong || 0}</div></div>
+                </div>
+                <h4 style="color:#fff;margin:20px 0 10px;">📊 Subject-wise Accuracy</h4>
+                <div class="card-grid">
+            `;
+
+            Object.keys(subjectStats).forEach(subj => {
+                const s = subjectStats[subj];
+                const acc = s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0;
+                html += `
+                    <div class="card">
+                        <div class="card-title">${subj}</div>
+                        <div class="card-value" style="color:${acc >= 70 ? '#10b981' : acc >= 40 ? '#f59e0b' : '#ef4444'};">${acc}%</div>
+                        <div style="color:#94a3b8;font-size:0.8rem;">${s.correct}/${s.total} correct</div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // LEADERBOARD
+        // ============================================================
+        function showLeaderboard() {
+            const students = DB.get('students', []);
+            const container = document.getElementById('leaderboardContainer');
+            if (!students.length) { container.innerHTML = '<p style="color:#94a3b8;">No students yet.</p>'; return; }
+
+            const sorted = [...students].filter(s => s.stats && s.stats.totalAttempted > 0)
+                .sort((a, b) => (b.stats?.accuracy || 0) - (a.stats?.accuracy || 0));
+
+            if (!sorted.length) { container.innerHTML = '<p style="color:#94a3b8;">No data available.</p>'; return; }
+
+            let html =
+                `<div class="table-wrap"><table><tr><th>Rank</th><th>Name</th><th>Accuracy</th><th>Attempted</th><th>Correct</th></tr>`;
+            sorted.forEach((s, i) => {
+                const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
+                html +=
+                    `<tr><td>${medal}</td><td>${s.name}</td><td>${s.stats?.accuracy||0}%</td><td>${s.stats?.totalAttempted||0}</td><td>${s.stats?.correct||0}</td></tr>`;
+            });
+            html += '</table></div>';
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // BACKUP & RESTORE
+        // ============================================================
+        function downloadBackup() {
+            const data = {
+                subjects: DB.get('subjects', []),
+                chapters: DB.get('chapters', []),
+                topics: DB.get('topics', []),
+                questions: DB.get('questions', []),
+                students: DB.get('students', []),
+                exams: DB.get('exams', []),
+                examHistory: DB.get('examHistory', []),
+                exportedAt: new Date().toISOString()
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `quiz_backup_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function restoreBackup(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    if (data.subjects) DB.set('subjects', data.subjects);
+                    if (data.chapters) DB.set('chapters', data.chapters);
+                    if (data.topics) DB.set('topics', data.topics);
+                    if (data.questions) DB.set('questions', data.questions);
+                    if (data.students) DB.set('students', data.students);
+                    if (data.exams) DB.set('exams', data.exams);
+                    if (data.examHistory) DB.set('examHistory', data.examHistory);
+                    document.getElementById('backupStatus').innerHTML =
+                        '<div class="status-success">✅ Backup restored successfully!</div>';
+                    loadAllData();
+                } catch (err) {
+                    document.getElementById('backupStatus').innerHTML =
+                        '<div class="status-error">❌ Invalid backup file!</div>';
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        }
+
+        // ============================================================
+        // MODAL
+        // ============================================================
+        function openModal(title, bodyHtml) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = bodyHtml;
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        // ============================================================
+        // HELPERS
+        // ============================================================
+        function shuffleArray(arr) {
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        loadAllData();
+        console.log('🔐 Admin Password: admin123');
+        console.log('📚 Smart Quiz System v5.4 Loaded Successfully!');
+        console.log('✅ Grid Removed - Clean Interface');
+        console.log('✅ Start From Input Box - Jump to any question');
+        console.log('✅ All features working!');
+    </script>
+
+</body>
+</html>
